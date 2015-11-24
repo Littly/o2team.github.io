@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-cn" class="theme-o2 page-post-detail">
+<head prefix="og: http://ogp.me/ns#">
+	<meta charset="utf-8">
+	<title>Git常用操作总结 | Aotu.io</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Canonical links -->
+<link rel="canonical" href="http://aotu.io/notes/2015/11/19/Git-Commands/index.html">
+<!-- Alternative links -->
+
+<!-- Icon -->
+<link rel="apple-touch-icon" sizes="57x57" href="/img/apple-touch-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/img/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/img/apple-touch-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/img/apple-touch-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/img/apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/img/apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/img/apple-touch-icon-152x152.png">
+<link rel="icon" type="image/png" href="/img/favicon-230x230.png" sizes="230x230">
+<link rel="icon" type="image/png" href="/img/favicon-96x96.png" sizes="96x96">
+<link rel="icon" type="image/png" href="/img/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/img/favicon-32x32.png" sizes="32x32">
+<meta name="msapplication-TileColor" content="#2f83cd">
+<meta name="msapplication-TileImage" content="/img/mstile-144x144.png">
+<!-- CSS -->
+<!-- build:css css/dist.style.css -->
+<link rel="stylesheet" href="/css/aotu.css" type="text/css">
+<!-- endbuild -->
+
+<link rel="stylesheet" href="/assets/fancybox/jquery.fancybox.css" type="text/css">
+
+<!-- RSS -->
+<link rel="alternative" href="/atom.xml" title="Aotu.io" type="application/atom+xml">
+<!-- Open Graph -->
+<meta name="description" content="用Git比较久了，之前一直在Win用的TortoiseGit，现在命令行用的比较多，所以把一些指令总结一下，以便回顾和查询。理解这些指令，觉得最重要的是理解Git的内部原理，比如Git的分布式版本控制，分清楚工作区、暂存区、版本库，还有就是理解Git跟踪并管理的是修改，而非文件。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Git常用操作总结">
+<meta property="og:url" content="http://aotu.io/notes/2015/11/19/Git-Commands/index.html">
+<meta property="og:site_name" content="Aotu.io">
+<meta property="og:description" content="用Git比较久了，之前一直在Win用的TortoiseGit，现在命令行用的比较多，所以把一些指令总结一下，以便回顾和查询。理解这些指令，觉得最重要的是理解Git的内部原理，比如Git的分布式版本控制，分清楚工作区、暂存区、版本库，还有就是理解Git跟踪并管理的是修改，而非文件。">
+<meta property="og:image" content="http://aotu.io/img/post/git-trees.jpg">
+<meta property="og:image" content="http://aotu.io/img/post/git-merge.png">
+<meta property="og:updated_time" content="2015-11-20T07:48:45.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Git常用操作总结">
+<meta name="twitter:description" content="用Git比较久了，之前一直在Win用的TortoiseGit，现在命令行用的比较多，所以把一些指令总结一下，以便回顾和查询。理解这些指令，觉得最重要的是理解Git的内部原理，比如Git的分布式版本控制，分清楚工作区、暂存区、版本库，还有就是理解Git跟踪并管理的是修改，而非文件。">
+<meta name="twitter:site" content="o2circle">
+<!-- Swiftype -->
+<meta class="swiftype" name="title" data-type="string" content="Git常用操作总结">
+<!-- Baidu Analytics -->
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?bb4b770d7fdf4e05245cd1327199d813";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+
+<script>
+var App = {
+    root:'/'    
+};
+</script>
+
+</head>
+<body itemscope itemtype="http://schema.org/WebPage">
+	<div id="wrapper" class="root">
+		
+		<header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+	<h1 class="logo-wrap"><a class="logo" href="/index.html" title="Aotu.io"><img src="/img/logo-206x70.png" alt="Aotu.io"/></a></h1>
+	<nav class="header-main">
+		<ul class="header-links">
+        	<li class="main-nav-item"><a href="/index.html" class="main-nav-link">首页</a></li><li class="main-nav-item"><a href="/notes/" class="main-nav-link">时间轴</a></li><li class="main-nav-item"><a href="/tags/" class="main-nav-link">标签</a></li><li class="main-nav-item"><a href="/about/" class="main-nav-link">关于</a></li>
+		</ul>
+	</nav>
+	<nav class="header-extra">
+		<ul class="header-links-extra">
+			<li class="search">
+				<a class="fa-search" href="#search">搜索</a>
+				<form id="search" method="get" class="search-form">
+					<input type="text" name="query" placeholder="搜索" />
+				</form>
+			</li>
+			<li class="menu">
+				<a class="fa-bars" href="#menu">Menu</a>
+			</li>
+		</ul>
+	</nav>
+</header>
+
+		
+		
+		<section id="menu" class="slide-menu">
+
+<!-- Search -->
+    <section>
+        <form class="search search-form" method="get">
+            <input type="text" name="query" placeholder="搜索" />
+        </form>
+    </section>
+
+<!-- Links -->
+    <section>
+        <ul class="links">
+            
+            <li>
+                <a href="https://jdc.jd.com">
+                    <h3>JDC</h3>
+                    <p>京东用户体验设计中心</p>
+                </a>
+            </li>
+            
+            <li>
+                <a href="https://tgideas.qq.com">
+                    <h3>TGIdeas</h3>
+                    <p>腾讯互娱市场部设计中心</p>
+                </a>
+            </li>
+            
+            <li>
+                <a href="https://isux.us">
+                    <h3>ISUX</h3>
+                    <p>腾讯SNG用户体验设计中心</p>
+                </a>
+            </li>
+            
+        </ul>
+    </section>
+
+<!-- Actions -->
+    <section>
+        <ul class="actions vertical">
+            <li><a href="https://github.com/o2team" class="button big fit"><i class="fa fa-github"></i>Github</a></li>
+        </ul>
+    </section>
+</section>
+
+		<section id="smSearch" class="slide-search">
+
+<!-- Search -->
+    <section>
+        <form class="search search-form" method="get">
+            <input type="text" name="query" placeholder="搜索" />
+        </form>
+    </section>
+
+<!-- Links -->
+    <section>
+		<h3>搜索结果</h3>
+        <ul class="links" id="searchResults">Loading...</ul>
+    </section>
+
+</section>
+
+<script id="tplSearch" type="text/hogan-tpl">
+    {{#items}}
+    <li>
+        <a href="{{ url }}" target="_blank">
+            <h3>{{ title }}</h3>
+            {{#desc}}
+			<p>{{ desc }}</p>
+			{{/desc}}
+        </a>
+    </li>
+    {{/items}}
+</script>
+
+
+		
+		
+
+<!-- Post -->
+<article class="post" itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
+        <div class="post-title">
+            <h2><a href="/notes/2015/11/19/Git-Commands/" itemprop="name">Git常用操作总结</a></h2>
+            <ul class="post-stats">
+                
+                
+                <li><a href='/tags/Fork/' class='meta-tag'>Fork</a></li>
+                
+                <li><a href='/tags/Git/' class='meta-tag'>Git</a></li>
+                 
+                
+                <li title="字数"><span class="icon fa-font">781</span></li>
+                
+                <li id="busuanzi_container_page_pv" title="热度"><span class="icon fa-eye" id="busuanzi_value_page_pv"></span></li>
+                
+                
+                <li>
+                    <a href="/notes/2015/11/19/Git-Commands/#comments" itemprop="discussionUrl" class="lnk-comments">
+                        <span class="post-comments-count ds-thread-count icon fa-comments" data-thread-key="notes/2015/11/19/Git-Commands/" itemprop="commentsCount">0</span>
+                    </a>
+                </li>
+                 
+            </ul>
+            
+            <p>理解Git的内部原理，分清楚工作区、暂存区、版本库，还有就是理解Git跟踪并管理的是修改，而非文件。</p>
+            
+        </div>
+        <div class="post-meta">
+            <time class="published" datetime="2015-11-19T12:44:25.000Z" itempro="datePublished">星期四, 11月19日 2015</time>
+            <a target="_blank" href="https://github.com/mamboer" class="author"><span class="name">LV主唱大人</span><img src="https://avatars.githubusercontent.com/mamboer?v=3&s=80" alt="mamboer" /></a>
+        </div>
+    </header>
+    <a href="/notes/2015/11/19/Git-Commands/" class="image featured post-cover"><img src="/img/post/git-flow.jpg" alt="Git常用操作总结" /></a>
+    <div class="post-content" itemprop="articleBody" data-swiftype-index="true">
+        <p>用Git比较久了，之前一直在Win用的TortoiseGit，现在命令行用的比较多，所以把一些指令总结一下，以便回顾和查询。<br>理解这些指令，觉得最重要的是理解Git的内部原理，比如Git的分布式版本控制，分清楚工作区、暂存区、版本库，还有就是理解Git跟踪并管理的是修改，而非文件。</p>
+<a id="more"></a>
+<h3 id="设置" class="post-heading">设置<a class="post-anchor" href="#设置" aria-hidden="true"></a></h3><pre><code>$ git config --global user<span class="class">.name</span> <span class="string">"Your Name"</span>
+$ git config --global user<span class="class">.email</span> <span class="string">"email@example.com"</span>
+</code></pre><h3 id="提交" class="post-heading">提交<a class="post-anchor" href="#提交" aria-hidden="true"></a></h3><p>git tracked的是修改，而不是文件</p>
+<p><img src="/img/post/git-trees.jpg" alt="git-track"></p>
+<pre><code><span class="comment">#将“当前修改”移动到暂存区(stage)</span>
+<span class="variable">$ </span>git add somfile.txt
+<span class="comment">#将暂存区修改提交</span>
+<span class="variable">$ </span>git commit -m <span class="string">"Add somfile.txt."</span>
+</code></pre><h3 id="状态" class="post-heading">状态<a class="post-anchor" href="#状态" aria-hidden="true"></a></h3><pre><code><span class="variable">$ </span>git status
+<span class="variable">$ </span>git diff
+</code></pre><h3 id="回退" class="post-heading">回退<a class="post-anchor" href="#回退" aria-hidden="true"></a></h3><pre><code># 放弃工作区修改
+$ git checkout <span class="comment">-- file.name</span>
+$ git checkout <span class="comment">-- .</span>
+
+# 取消<span class="operator"><span class="keyword">commit</span>(比如需要重写<span class="keyword">commit</span>信息)
+$ git <span class="keyword">reset</span> <span class="comment">--soft HEAD</span>
+
+# 取消<span class="keyword">commit</span>、<span class="keyword">add</span>(重新提交代码和<span class="keyword">commit</span>)
+$ git <span class="keyword">reset</span> <span class="keyword">HEAD</span>
+$ git <span class="keyword">reset</span> <span class="comment">--mixed HEAD</span>
+
+# 取消<span class="keyword">commit</span>、<span class="keyword">add</span>、工作区修改(需要完全重置)
+$ git <span class="keyword">reset</span> <span class="comment">--hard HEAD</span></span>
+</code></pre><h3 id="记录" class="post-heading">记录<a class="post-anchor" href="#记录" aria-hidden="true"></a></h3><pre><code><span class="variable">$ </span>git reflog
+<span class="variable">$ </span>git log
+</code></pre><h3 id="删除" class="post-heading">删除<a class="post-anchor" href="#删除" aria-hidden="true"></a></h3><pre><code>$ <span class="keyword">rm</span> <span class="keyword">file</span>.name
+$ git <span class="keyword">rm</span> <span class="keyword">file</span>.name
+$ git commit -<span class="keyword">m</span> <span class="string">"Del"</span>
+</code></pre><h3 id="远程操作" class="post-heading">远程操作<a class="post-anchor" href="#远程操作" aria-hidden="true"></a></h3><pre><code>$ git remote add origin git@github.com:michaelliao/learngit.git
+<span class="comment"># 第一次推送，-u(--set-upstream)指定默认上游</span>
+$ git push -u origin <span class="keyword">master</span>
+<span class="title">$</span> git push origin <span class="literal">master</span>
+</code></pre><h3 id="克隆" class="post-heading">克隆<a class="post-anchor" href="#克隆" aria-hidden="true"></a></h3><pre><code>$ git clone https:<span class="comment">//github.com/Yikun/yikun.github.com.git path</span>
+$ git clone git@github<span class="class">.com</span>:Yikun/yikun<span class="class">.github</span><span class="class">.com</span><span class="class">.git</span> path
+</code></pre><h3 id="分支操作" class="post-heading">分支操作<a class="post-anchor" href="#分支操作" aria-hidden="true"></a></h3><p><img src="/img/post/git-merge.png" alt="about-merge"></p>
+<pre><code><span class="comment"># 查看当前分支</span>
+<span class="variable">$ </span>git branch
+
+<span class="comment"># 创建分支</span>
+<span class="variable">$ </span>git branch dev
+<span class="comment"># 切换分支</span>
+<span class="variable">$ </span>git checkout dev
+
+<span class="comment"># 创建并checkout分支</span>
+<span class="variable">$ </span>git checkout -b dev
+
+<span class="comment"># 合并分支</span>
+<span class="variable">$ </span>git merge dev
+
+<span class="comment"># 删除分支</span>
+<span class="variable">$ </span>git branch -d dev
+</code></pre><h3 id="标签" class="post-heading">标签<a class="post-anchor" href="#标签" aria-hidden="true"></a></h3><pre><code>$ git <span class="keyword">tag</span> <span class="title">0</span>.<span class="number">1.1</span>
+$ git push origin --tags
+</code></pre><p>注意：本文Fork自 <a href="http://yikun.github.io/" target="_blank" rel="external">yikun.github.io</a>，<a href="http://aotu.io">凹凸实验室</a>作进一步完善。</p>
+
+    </div>
+    <div class="post-revision">
+        <i class="fa fa-clock-o"></i> <time class="post-updated" datetime="2015-11-20T07:48:45.000Z" itemprop="dateModified">上次更新：星期五, 11月20日 2015 07:48:45</time>
+    </div>
+    
+<ul class="actions pagination pagination-post">
+    
+    <li class="pagination-post-prev"><a href="/notes/2015/11/20/101-percent/" class="button big" title="101%还原"><i class="fa fa-chevron-left"></i> 101%还原</a></li>
+    
+    
+    <li class="pagination-post-next"><a href="/notes/2015/11/18/css-stack-order/" class="button big" title="css层叠顺序探究"><i class="fa fa-chevron-right"></i> css层叠顺序探究</a></li>
+    
+</ul>
+
+
+    
+
+
+<div class="post-comments" id="comments">
+<!-- 多说评论框 start -->
+<div class="ds-thread" data-thread-key="http://aotu.io/notes/2015/11/19/Git-Commands/index.html" data-title="Git常用操作总结" data-url="http://aotu.io/notes/2015/11/19/Git-Commands/index.html"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    var duoshuoQuery = {short_name:"aotu"};
+    (function() {
+        var ds = document.createElement('script');
+        ds.id = "duoshuo-script";
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0] 
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<!-- 多说公共JS代码 end -->
+
+
+
+</div>
+
+
+</article>
+
+<footer id="footer" class="footer">
+    <ul class="icons">
+        <li><a href="https://twitter.com/o2circle" class="footer-link" target="_blank"><i class="fa fa-twitter"></i></a></li>
+        <li><a href="https://github.com/o2team/o2team.github.io" class="footer-link" target="_blank"><i class="fa fa-github-alt"></i></a></li>
+        <li><a href="/atom.xml" class="fa-rss"><span class="label">RSS</span></a></li>
+    </ul>
+    <div class="copyright">
+      &copy; 2015 <a href="http://aotu.io" target="_blank">凹凸实验室</a><br>
+      Documentation licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.
+    </div>
+    
+    <div class="site-stats">
+        <span id="busuanzi_container_site_pv" class="site-pv">
+            总访问量: <span id="busuanzi_value_site_pv" class="site-pv-num"></span> 次
+        </span>
+        <span id="busuanzi_container_site_uv" class="site-uv">
+            总访客数: <span id="busuanzi_value_site_uv" class="site-uv-num"></span> 人
+        </span>
+    </div>
+    
+</footer>
+
+
+		
+		<!-- Scripts -->
+<!-- build:js js/dist.main.js -->
+<script src="/js/lunr.js" type="text/javascript"></script>
+<script src="/js/debounce.js" type="text/javascript"></script>
+<script src="/js/jquery.js" type="text/javascript"></script>
+<script src="/js/xhogan.js" type="text/javascript"></script>
+<script src="/js/hammer.js" type="text/javascript"></script>
+<script src="/assets/bootstrap/js/bootstrap.js" type="text/javascript"></script>
+<script src="/js/lang_select.js" type="text/javascript"></script>
+<script src="/js/toc.js" type="text/javascript"></script>
+<script src="/js/mobile_nav.js" type="text/javascript"></script>
+<script src="/js/skel.js" type="text/javascript"></script>
+<script src="/js/util.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+<script src="/js/search.js" type="text/javascript"></script>
+<!-- endbuild -->
+
+
+<script src="/assets/fancybox/jquery.fancybox.js" type="text/javascript"></script>
+<script src="/js/fancybox.js" type="text/javascript"></script>
+
+
+
+<script src="/js/ua-parser.min.js" type="text/javascript"></script>
+<script src="/js/duoshuo.js" type="text/javascript"></script>
+
+
+
+
+
+<!--busuanzi-->
+<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+		
+	</div>
+	
+	<div class="back-to-top" id="backTop"><i class="fa fa-long-arrow-up"></i></div>
+	
+</body>
+</html>
