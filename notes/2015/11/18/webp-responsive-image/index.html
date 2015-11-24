@@ -46,7 +46,7 @@
 图片在如今的站点上不可或缺。试想一下，在我们网页上没有图片会怎样？高质量的图片能够使你的站点更加出色，但同时伴随着一定的性能损耗。由于图片文件较大，下载时间相对较长并且会减缓页面的加载">
 <meta property="og:image" content="http://a43d55f6a02c4be185ce-9cfa4cf7c673a59966ad8296f4c88804.r44.cf3.rackcdn.com/WebP/logo-webp.png">
 <meta property="og:image" content="http://a43d55f6a02c4be185ce-9cfa4cf7c673a59966ad8296f4c88804.r44.cf3.rackcdn.com/Service-Workers-WebP/accept-headers-webp.png">
-<meta property="og:updated_time" content="2015-11-19T09:52:12.000Z">
+<meta property="og:updated_time" content="2015-11-24T12:55:36.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Service Workers：采用WebP动态响应图片">
 <meta name="twitter:description" content="译文地址：http://deanhume.com/Home/BlogPost/service-workers--dynamic-responsive-images-using-webp-images/10132/
@@ -82,7 +82,7 @@ var App = {
 	<h1 class="logo-wrap"><a class="logo" href="/index.html" title="Aotu.io"><img src="/img/logo-206x70.png" alt="Aotu.io"/></a></h1>
 	<nav class="header-main">
 		<ul class="header-links">
-        	<li class="main-nav-item"><a href="/index.html" class="main-nav-link">首页</a></li><li class="main-nav-item"><a href="/notes/" class="main-nav-link">时间轴</a></li><li class="main-nav-item"><a href="/tags/" class="main-nav-link">标签</a></li><li class="main-nav-item"><a href="/about/" class="main-nav-link">关于</a></li>
+        	<li class="main-nav-item"><a href="/index.html" class="main-nav-link">首页</a></li><li class="main-nav-item active"><a href="/notes/" class="main-nav-link">时间轴</a></li><li class="main-nav-item"><a href="/tags/" class="main-nav-link">标签</a></li><li class="main-nav-item"><a href="/about/" class="main-nav-link">关于</a></li>
 		</ul>
 	</nav>
 	<nav class="header-extra">
@@ -99,84 +99,6 @@ var App = {
 		</ul>
 	</nav>
 </header>
-
-		
-		
-		<section id="menu" class="slide-menu">
-
-<!-- Search -->
-    <section>
-        <form class="search search-form" method="get">
-            <input type="text" name="query" placeholder="搜索" />
-        </form>
-    </section>
-
-<!-- Links -->
-    <section>
-        <ul class="links">
-            
-            <li>
-                <a href="https://jdc.jd.com">
-                    <h3>JDC</h3>
-                    <p>京东用户体验设计中心</p>
-                </a>
-            </li>
-            
-            <li>
-                <a href="https://tgideas.qq.com">
-                    <h3>TGIdeas</h3>
-                    <p>腾讯互娱市场部设计中心</p>
-                </a>
-            </li>
-            
-            <li>
-                <a href="https://isux.us">
-                    <h3>ISUX</h3>
-                    <p>腾讯SNG用户体验设计中心</p>
-                </a>
-            </li>
-            
-        </ul>
-    </section>
-
-<!-- Actions -->
-    <section>
-        <ul class="actions vertical">
-            <li><a href="https://github.com/o2team" class="button big fit"><i class="fa fa-github"></i>Github</a></li>
-        </ul>
-    </section>
-</section>
-
-		<section id="smSearch" class="slide-search">
-
-<!-- Search -->
-    <section>
-        <form class="search search-form" method="get">
-            <input type="text" name="query" placeholder="搜索" />
-        </form>
-    </section>
-
-<!-- Links -->
-    <section>
-		<h3>搜索结果</h3>
-        <ul class="links" id="searchResults">Loading...</ul>
-    </section>
-
-</section>
-
-<script id="tplSearch" type="text/hogan-tpl">
-    {{#items}}
-    <li>
-        <a href="{{ url }}" target="_blank">
-            <h3>{{ title }}</h3>
-            {{#desc}}
-			<p>{{ desc }}</p>
-			{{/desc}}
-        </a>
-    </li>
-    {{/items}}
-</script>
-
 
 		
 		
@@ -212,10 +134,10 @@ var App = {
         </div>
         <div class="post-meta">
             <time class="published" datetime="2015-11-17T18:44:25.000Z" itempro="datePublished">星期二, 11月17日 2015</time>
-            <a target="_blank" href="https://github.com/wengeek" class="author"><span class="name">伟哥</span><img src="https://avatars.githubusercontent.com/wengeek?v=3&s=80" alt="wengeek" /></a>
+            <a target="_blank" href="https://github.com/wengeek" class="author"><span class="name">WEN</span><img src="https://avatars.githubusercontent.com/wengeek?v=3&s=80" alt="wengeek" /></a>
         </div>
     </header>
-    <a href="/notes/2015/11/18/webp-responsive-image/" class="image featured post-cover"><img src="/img/post/post-default.png" alt="Service Workers：采用WebP动态响应图片" /></a>
+    <a href="/notes/2015/11/18/webp-responsive-image/" class="image featured post-cover"><img src="/img/post/wengeek/responsive-image.png" alt="Service Workers：采用WebP动态响应图片" /></a>
     <div class="post-content" itemprop="articleBody" data-swiftype-index="true">
         <blockquote>
 <p>译文地址：<a href="http://deanhume.com/Home/BlogPost/service-workers--dynamic-responsive-images-using-webp-images/10132/" target="_blank" rel="external">http://deanhume.com/Home/BlogPost/service-workers--dynamic-responsive-images-using-webp-images/10132/</a></p>
@@ -251,15 +173,15 @@ var App = {
 
     </div>
     <div class="post-revision">
-        <i class="fa fa-clock-o"></i> <time class="post-updated" datetime="2015-11-19T09:52:12.000Z" itemprop="dateModified">上次更新：星期四, 11月19日 2015 09:52:12</time>
+        <i class="fa fa-clock-o"></i> <time class="post-updated" datetime="2015-11-24T12:55:36.000Z" itemprop="dateModified">上次更新：星期二, 11月24日 2015 12:55:36</time>
     </div>
     
 <ul class="actions pagination pagination-post">
     
-    <li class="pagination-post-prev"><a href="/notes/2015/11/18/flash-canvas/" class="button big" title="使用Adobe FLASH CC制作Canvas动画"><i class="fa fa-chevron-left"></i> 使用Adobe FLASH CC制作Canvas动画</a></li>
+    <li class="pagination-post-prev"><a href="/notes/2015/11/18/phantomJs-crawler/" class="button big" title="基于phantomJs的网络爬虫"><i class="fa fa-chevron-left"></i> 基于phantomJs的网络爬虫</a></li>
     
     
-    <li class="pagination-post-next"><a href="/notes/2015/11/16/zepto-cors/" class="button big" title="前方有坑，请绕道——Zepto 中使用 CORS"><i class="fa fa-chevron-right"></i> 前方有坑，请绕道——Zepto 中使用 CORS</a></li>
+    <li class="pagination-post-next"><a href="/notes/2015/11/18/flash-canvas/" class="button big" title="使用Adobe FLASH CC制作Canvas动画">使用Adobe FLASH CC制作Canvas动画 <i class="fa fa-chevron-right"></i></a></li>
     
 </ul>
 
@@ -304,7 +226,7 @@ var App = {
       Documentation licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.
     </div>
     
-    <div class="site-stats">
+    <div class="site-stats" style="display:none">
         <span id="busuanzi_container_site_pv" class="site-pv">
             总访问量: <span id="busuanzi_value_site_pv" class="site-pv-num"></span> 次
         </span>
@@ -316,8 +238,95 @@ var App = {
 </footer>
 
 
-		
-		<!-- Scripts -->
+	</div>
+    
+    <section id="menu" class="slide-menu">
+
+    <!-- Search -->
+    <section>
+        <form class="search search-form" method="get">
+            <input type="text" name="query" placeholder="搜索" />
+        </form>
+    </section>
+
+    <section>
+        <ul class="links sm-links-aotu">
+        <li class="main-nav-item"><a href="/index.html" class="main-nav-link">首页</a></li><li class="main-nav-item active"><a href="/notes/" class="main-nav-link">时间轴</a></li><li class="main-nav-item"><a href="/tags/" class="main-nav-link">标签</a></li><li class="main-nav-item"><a href="/about/" class="main-nav-link">关于</a></li>
+        </ul>
+    </section>
+    <!-- Links -->
+    <section>
+        <ul class="links">
+            
+            <li>
+                <a href="https://jdc.jd.com">
+                    <h3>JDC</h3>
+                    <p>京东用户体验设计中心</p>
+                </a>
+            </li>
+            
+            <li>
+                <a href="https://tgideas.qq.com">
+                    <h3>TGIdeas</h3>
+                    <p>腾讯互娱市场部设计中心</p>
+                </a>
+            </li>
+            
+            <li>
+                <a href="https://isux.us">
+                    <h3>ISUX</h3>
+                    <p>腾讯SNG用户体验设计中心</p>
+                </a>
+            </li>
+            
+        </ul>
+    </section>
+
+    <!-- Actions -->
+    <section>
+        <ul class="actions vertical">
+            <li><a href="https://github.com/o2team" class="button big fit"><i class="fa fa-github"></i>Github</a></li>
+        </ul>
+    </section>
+</section>
+
+    <section id="smSearch" class="slide-search">
+
+<!-- Search -->
+    <section>
+        <form class="search search-form" method="get">
+            <input type="text" name="query" placeholder="搜索" />
+        </form>
+    </section>
+
+<!-- Links -->
+    <section>
+		<h3>搜索结果</h3>
+        <ul class="links" id="searchResults">Loading...</ul>
+    </section>
+
+</section>
+
+<script id="tplSearch" type="text/hogan-tpl">
+    {{#items}}
+    <li>
+        <a href="{{ url }}" target="_blank">
+            <h3>{{ title }}</h3>
+            {{#desc}}
+			<p>{{ desc }}</p>
+			{{/desc}}
+        </a>
+    </li>
+    {{/items}}
+</script>
+
+
+    
+	
+	<div class="back-to-top" id="backTop"><i class="fa fa-long-arrow-up"></i></div>
+	
+    
+    <!-- Scripts -->
 <!-- build:js js/dist.main.js -->
 <script src="/js/lunr.js" type="text/javascript"></script>
 <script src="/js/debounce.js" type="text/javascript"></script>
@@ -351,10 +360,6 @@ var App = {
 <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
-		
-	</div>
-	
-	<div class="back-to-top" id="backTop"><i class="fa fa-long-arrow-up"></i></div>
-	
+    
 </body>
 </html>

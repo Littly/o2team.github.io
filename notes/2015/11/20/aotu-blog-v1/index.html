@@ -40,7 +40,7 @@
 <meta property="og:url" content="http://aotu.io/notes/2015/11/20/aotu-blog-v1/index.html">
 <meta property="og:site_name" content="Aotu.io">
 <meta property="og:description" content="筹备了两周多，凹凸实验室博客 V1.0.0 正式发布啦，欢迎同学们体验并提供建议。它是一个托管于Github的静态博客，基于HEXO搭建，主题的定做参考自future-imperfect的扁平简约，暂且命名为o2。主题单独开源于 hexo-theme-o2，有兴趣的朋友可以自由下载使用。">
-<meta property="og:updated_time" content="2015-11-23T09:29:30.000Z">
+<meta property="og:updated_time" content="2015-11-24T11:25:13.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="凹凸实验室博客V1.0.0发布">
 <meta name="twitter:description" content="筹备了两周多，凹凸实验室博客 V1.0.0 正式发布啦，欢迎同学们体验并提供建议。它是一个托管于Github的静态博客，基于HEXO搭建，主题的定做参考自future-imperfect的扁平简约，暂且命名为o2。主题单独开源于 hexo-theme-o2，有兴趣的朋友可以自由下载使用。">
@@ -74,7 +74,7 @@ var App = {
 	<h1 class="logo-wrap"><a class="logo" href="/index.html" title="Aotu.io"><img src="/img/logo-206x70.png" alt="Aotu.io"/></a></h1>
 	<nav class="header-main">
 		<ul class="header-links">
-        	<li class="main-nav-item"><a href="/index.html" class="main-nav-link">首页</a></li><li class="main-nav-item"><a href="/notes/" class="main-nav-link">时间轴</a></li><li class="main-nav-item"><a href="/tags/" class="main-nav-link">标签</a></li><li class="main-nav-item"><a href="/about/" class="main-nav-link">关于</a></li>
+        	<li class="main-nav-item"><a href="/index.html" class="main-nav-link">首页</a></li><li class="main-nav-item active"><a href="/notes/" class="main-nav-link">时间轴</a></li><li class="main-nav-item"><a href="/tags/" class="main-nav-link">标签</a></li><li class="main-nav-item"><a href="/about/" class="main-nav-link">关于</a></li>
 		</ul>
 	</nav>
 	<nav class="header-extra">
@@ -91,84 +91,6 @@ var App = {
 		</ul>
 	</nav>
 </header>
-
-		
-		
-		<section id="menu" class="slide-menu">
-
-<!-- Search -->
-    <section>
-        <form class="search search-form" method="get">
-            <input type="text" name="query" placeholder="搜索" />
-        </form>
-    </section>
-
-<!-- Links -->
-    <section>
-        <ul class="links">
-            
-            <li>
-                <a href="https://jdc.jd.com">
-                    <h3>JDC</h3>
-                    <p>京东用户体验设计中心</p>
-                </a>
-            </li>
-            
-            <li>
-                <a href="https://tgideas.qq.com">
-                    <h3>TGIdeas</h3>
-                    <p>腾讯互娱市场部设计中心</p>
-                </a>
-            </li>
-            
-            <li>
-                <a href="https://isux.us">
-                    <h3>ISUX</h3>
-                    <p>腾讯SNG用户体验设计中心</p>
-                </a>
-            </li>
-            
-        </ul>
-    </section>
-
-<!-- Actions -->
-    <section>
-        <ul class="actions vertical">
-            <li><a href="https://github.com/o2team" class="button big fit"><i class="fa fa-github"></i>Github</a></li>
-        </ul>
-    </section>
-</section>
-
-		<section id="smSearch" class="slide-search">
-
-<!-- Search -->
-    <section>
-        <form class="search search-form" method="get">
-            <input type="text" name="query" placeholder="搜索" />
-        </form>
-    </section>
-
-<!-- Links -->
-    <section>
-		<h3>搜索结果</h3>
-        <ul class="links" id="searchResults">Loading...</ul>
-    </section>
-
-</section>
-
-<script id="tplSearch" type="text/hogan-tpl">
-    {{#items}}
-    <li>
-        <a href="{{ url }}" target="_blank">
-            <h3>{{ title }}</h3>
-            {{#desc}}
-			<p>{{ desc }}</p>
-			{{/desc}}
-        </a>
-    </li>
-    {{/items}}
-</script>
-
 
 		
 		
@@ -267,7 +189,7 @@ var App = {
 
     </div>
     <div class="post-revision">
-        <i class="fa fa-clock-o"></i> <time class="post-updated" datetime="2015-11-23T09:29:30.000Z" itemprop="dateModified">上次更新：星期一, 11月23日 2015 09:29:30</time>
+        <i class="fa fa-clock-o"></i> <time class="post-updated" datetime="2015-11-24T11:25:13.000Z" itemprop="dateModified">上次更新：星期二, 11月24日 2015 11:25:13</time>
     </div>
     
 <ul class="actions pagination pagination-post">
@@ -275,7 +197,7 @@ var App = {
     <li class="pagination-post-prev"><a href="/notes/2015/11/20/svg-I-know/" class="button big" title="SVG I Know"><i class="fa fa-chevron-left"></i> SVG I Know</a></li>
     
     
-    <li class="pagination-post-next"><a href="/notes/2015/11/20/101-percent/" class="button big" title="101%还原"><i class="fa fa-chevron-right"></i> 101%还原</a></li>
+    <li class="pagination-post-next"><a href="/notes/2015/11/20/101-percent/" class="button big" title="101%还原">101%还原 <i class="fa fa-chevron-right"></i></a></li>
     
 </ul>
 
@@ -320,7 +242,7 @@ var App = {
       Documentation licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.
     </div>
     
-    <div class="site-stats">
+    <div class="site-stats" style="display:none">
         <span id="busuanzi_container_site_pv" class="site-pv">
             总访问量: <span id="busuanzi_value_site_pv" class="site-pv-num"></span> 次
         </span>
@@ -332,8 +254,95 @@ var App = {
 </footer>
 
 
-		
-		<!-- Scripts -->
+	</div>
+    
+    <section id="menu" class="slide-menu">
+
+    <!-- Search -->
+    <section>
+        <form class="search search-form" method="get">
+            <input type="text" name="query" placeholder="搜索" />
+        </form>
+    </section>
+
+    <section>
+        <ul class="links sm-links-aotu">
+        <li class="main-nav-item"><a href="/index.html" class="main-nav-link">首页</a></li><li class="main-nav-item active"><a href="/notes/" class="main-nav-link">时间轴</a></li><li class="main-nav-item"><a href="/tags/" class="main-nav-link">标签</a></li><li class="main-nav-item"><a href="/about/" class="main-nav-link">关于</a></li>
+        </ul>
+    </section>
+    <!-- Links -->
+    <section>
+        <ul class="links">
+            
+            <li>
+                <a href="https://jdc.jd.com">
+                    <h3>JDC</h3>
+                    <p>京东用户体验设计中心</p>
+                </a>
+            </li>
+            
+            <li>
+                <a href="https://tgideas.qq.com">
+                    <h3>TGIdeas</h3>
+                    <p>腾讯互娱市场部设计中心</p>
+                </a>
+            </li>
+            
+            <li>
+                <a href="https://isux.us">
+                    <h3>ISUX</h3>
+                    <p>腾讯SNG用户体验设计中心</p>
+                </a>
+            </li>
+            
+        </ul>
+    </section>
+
+    <!-- Actions -->
+    <section>
+        <ul class="actions vertical">
+            <li><a href="https://github.com/o2team" class="button big fit"><i class="fa fa-github"></i>Github</a></li>
+        </ul>
+    </section>
+</section>
+
+    <section id="smSearch" class="slide-search">
+
+<!-- Search -->
+    <section>
+        <form class="search search-form" method="get">
+            <input type="text" name="query" placeholder="搜索" />
+        </form>
+    </section>
+
+<!-- Links -->
+    <section>
+		<h3>搜索结果</h3>
+        <ul class="links" id="searchResults">Loading...</ul>
+    </section>
+
+</section>
+
+<script id="tplSearch" type="text/hogan-tpl">
+    {{#items}}
+    <li>
+        <a href="{{ url }}" target="_blank">
+            <h3>{{ title }}</h3>
+            {{#desc}}
+			<p>{{ desc }}</p>
+			{{/desc}}
+        </a>
+    </li>
+    {{/items}}
+</script>
+
+
+    
+	
+	<div class="back-to-top" id="backTop"><i class="fa fa-long-arrow-up"></i></div>
+	
+    
+    <!-- Scripts -->
 <!-- build:js js/dist.main.js -->
 <script src="/js/lunr.js" type="text/javascript"></script>
 <script src="/js/debounce.js" type="text/javascript"></script>
@@ -367,10 +376,6 @@ var App = {
 <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
-		
-	</div>
-	
-	<div class="back-to-top" id="backTop"><i class="fa fa-long-arrow-up"></i></div>
-	
+    
 </body>
 </html>

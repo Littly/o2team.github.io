@@ -21,7 +21,7 @@
         $panelInput = $panel.find('input'),
         $panelForm = $panel.find('form'),
         $panelTip = $('#searchResults');
-    $panel.appendTo($body)
+    $panel
         .panel({
             delay: 500,
             hideOnClick: true,
@@ -63,7 +63,9 @@
     },
     onIndexed = function(term){
         var res = idx.search(term);
+        $panel.removeClass('no-res'); 
         if(res.length === 0){
+            $panel.addClass('no-res');
             showTip('无相关结果!');
             return;
         }

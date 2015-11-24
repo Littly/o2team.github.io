@@ -46,15 +46,15 @@ In CSS 2.1, each box has a position in three dimensions. In addition to their ho
 首先上一大段文绉绉的w3c规范以表明这是一篇严肃的学术文章（觉得太长可先跳过~）：
 
 In CSS 2.1, each box has a position in three dimensions. In addition to their horizontal and vertical positions, boxes lie along a “z-axis">
-<meta property="og:image" content="http://labs.qiang.it/yetty/stack/z-index3.png">
-<meta property="og:image" content="http://labs.qiang.it/yetty/stack/z-index4.png">
-<meta property="og:image" content="http://labs.qiang.it/yetty/stack/z-index.png">
-<meta property="og:image" content="http://labs.qiang.it/yetty/stack/z-index2.png">
-<meta property="og:image" content="http://labs.qiang.it/yetty/stack/1.png">
-<meta property="og:image" content="http://labs.qiang.it/yetty/stack/css2.png">
-<meta property="og:image" content="http://labs.qiang.it/yetty/stack/ie.png">
-<meta property="og:image" content="http://labs.qiang.it/yetty/stack/opacity.png">
-<meta property="og:updated_time" content="2015-11-23T02:20:42.000Z">
+<meta property="og:image" content="http://aotu.io/img/post/2015-11-18-stack-order/1-1-normal-order.png">
+<meta property="og:image" content="http://aotu.io/img/post/2015-11-18-stack-order/1-2-change-order.png">
+<meta property="og:image" content="http://aotu.io/img/post/2015-11-18-stack-order/2-1-normal-order.png">
+<meta property="og:image" content="http://aotu.io/img/post/2015-11-18-stack-order/2-2-change-order.png">
+<meta property="og:image" content="http://aotu.io/img/post/2015-11-18-stack-order/3-1-summay-order.png">
+<meta property="og:image" content="http://aotu.io/img/post/2015-11-18-stack-order/4-1-normal-order.png">
+<meta property="og:image" content="http://aotu.io/img/post/2015-11-18-stack-order/4-2-ie-bug.png">
+<meta property="og:image" content="http://aotu.io/img/post/2015-11-18-stack-order/4-3-opacity-order.png">
+<meta property="og:updated_time" content="2015-11-24T11:13:40.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="css层叠顺序探究">
 <meta name="twitter:description" content="嗯~一个比较基础但容易混乱的知识点~
@@ -91,7 +91,7 @@ var App = {
 	<h1 class="logo-wrap"><a class="logo" href="/index.html" title="Aotu.io"><img src="/img/logo-206x70.png" alt="Aotu.io"/></a></h1>
 	<nav class="header-main">
 		<ul class="header-links">
-        	<li class="main-nav-item"><a href="/index.html" class="main-nav-link">首页</a></li><li class="main-nav-item"><a href="/notes/" class="main-nav-link">时间轴</a></li><li class="main-nav-item"><a href="/tags/" class="main-nav-link">标签</a></li><li class="main-nav-item"><a href="/about/" class="main-nav-link">关于</a></li>
+        	<li class="main-nav-item"><a href="/index.html" class="main-nav-link">首页</a></li><li class="main-nav-item active"><a href="/notes/" class="main-nav-link">时间轴</a></li><li class="main-nav-item"><a href="/tags/" class="main-nav-link">标签</a></li><li class="main-nav-item"><a href="/about/" class="main-nav-link">关于</a></li>
 		</ul>
 	</nav>
 	<nav class="header-extra">
@@ -111,84 +111,6 @@ var App = {
 
 		
 		
-		<section id="menu" class="slide-menu">
-
-<!-- Search -->
-    <section>
-        <form class="search search-form" method="get">
-            <input type="text" name="query" placeholder="搜索" />
-        </form>
-    </section>
-
-<!-- Links -->
-    <section>
-        <ul class="links">
-            
-            <li>
-                <a href="https://jdc.jd.com">
-                    <h3>JDC</h3>
-                    <p>京东用户体验设计中心</p>
-                </a>
-            </li>
-            
-            <li>
-                <a href="https://tgideas.qq.com">
-                    <h3>TGIdeas</h3>
-                    <p>腾讯互娱市场部设计中心</p>
-                </a>
-            </li>
-            
-            <li>
-                <a href="https://isux.us">
-                    <h3>ISUX</h3>
-                    <p>腾讯SNG用户体验设计中心</p>
-                </a>
-            </li>
-            
-        </ul>
-    </section>
-
-<!-- Actions -->
-    <section>
-        <ul class="actions vertical">
-            <li><a href="https://github.com/o2team" class="button big fit"><i class="fa fa-github"></i>Github</a></li>
-        </ul>
-    </section>
-</section>
-
-		<section id="smSearch" class="slide-search">
-
-<!-- Search -->
-    <section>
-        <form class="search search-form" method="get">
-            <input type="text" name="query" placeholder="搜索" />
-        </form>
-    </section>
-
-<!-- Links -->
-    <section>
-		<h3>搜索结果</h3>
-        <ul class="links" id="searchResults">Loading...</ul>
-    </section>
-
-</section>
-
-<script id="tplSearch" type="text/hogan-tpl">
-    {{#items}}
-    <li>
-        <a href="{{ url }}" target="_blank">
-            <h3>{{ title }}</h3>
-            {{#desc}}
-			<p>{{ desc }}</p>
-			{{/desc}}
-        </a>
-    </li>
-    {{/items}}
-</script>
-
-
-		
-		
 
 <!-- Post -->
 <article class="post" itemscope itemtype="http://schema.org/Article">
@@ -201,7 +123,7 @@ var App = {
                 <li><a href='/tags/CSS/' class='meta-tag'>CSS</a></li>
                  
                 
-                <li title="字数"><span class="icon fa-font">4,238</span></li>
+                <li title="字数"><span class="icon fa-font">4,245</span></li>
                 
                 <li id="busuanzi_container_page_pv" title="热度"><span class="icon fa-eye" id="busuanzi_value_page_pv"></span></li>
                 
@@ -222,7 +144,7 @@ var App = {
             <a target="_blank" href="https://github.com/Yettyzyt" class="author"><span class="name">燕婷</span><img src="https://avatars.githubusercontent.com/Yettyzyt?v=3&s=80" alt="Yettyzyt" /></a>
         </div>
     </header>
-    <a href="/notes/2015/11/18/css-stack-order/" class="image featured post-cover"><img src="/img/post/post-default.png" alt="css层叠顺序探究" /></a>
+    <a href="/notes/2015/11/18/css-stack-order/" class="image featured post-cover"><img src="/img/post/2015-11-18-stack-order/cover.png" alt="css层叠顺序探究" /></a>
     <div class="post-content" itemprop="articleBody" data-swiftype-index="true">
         <p>嗯~一个比较基础但容易混乱的知识点~</p>
 <p>首先上一大段文绉绉的w3c规范以表明这是一篇严肃的学术文章（觉得太长可先跳过~）：</p>
@@ -236,7 +158,7 @@ var App = {
 <p><strong>1. 每个盒模型的位置是三维的，除了x轴和y轴，还有一个表示层叠的z轴；</strong></p>
 <p><strong>2. z轴上的位置决定了我们看到的盒模型之间的层叠效果（谁盖住谁）。</strong></p>
 <p>上述规范还解释了层叠上下文的特点以及盒模型的层叠级别，下面我们通过栗子慢慢探究。</p>
-<h2 id="1-_浮动与行内" class="post-heading">1. 浮动与行内<a class="post-anchor" href="#1-_浮动与行内" aria-hidden="true"></a></h2><p><strong>eg.1-eg.2共同结构与样式</strong></p>
+<h2 id="1-_浮动与行内" class="post-heading">1. 浮动与行内<a class="post-anchor" href="#1-_浮动与行内" aria-hidden="true"></a></h2><p><strong>eg.1-1/eg.1-2共同结构与样式</strong></p>
 <p>html:</p>
 <pre><code>&lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"div1"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
 &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"div2"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
@@ -250,12 +172,12 @@ var App = {
 <span class="class">.div3</span><span class="rules">{<span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#F9CCAD</span></span></span>;<span class="rule"><span class="attribute">margin</span>:<span class="value">-<span class="number">160px</span> <span class="number">40px</span></span></span>;}</span>
 <span class="class">.div4</span><span class="rules">{<span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#C7C7A8</span></span></span>;<span class="rule"><span class="attribute">margin</span>:<span class="value">-<span class="number">150px</span> <span class="number">60px</span></span></span>;}</span>
 <span class="class">.div5</span><span class="rules">{<span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#84AF9B</span></span></span>;<span class="rule"><span class="attribute">margin</span>:<span class="value">-<span class="number">140px</span> -<span class="number">10px</span></span></span>;}</span>
-</code></pre><p><strong>eg.1：常规流中非定位非行内元素的层叠情况</strong></p>
-<p><img src="http://labs.qiang.it/yetty/stack/z-index3.png" alt="eg.1"></p>
+</code></pre><p><strong>eg.1-1：常规流中非定位非行内元素的层叠情况</strong></p>
+<img src="/img/post/2015-11-18-stack-order/1-1-normal-order.png">
 <p><strong>＊ 结论： 常规流中非定位非行内的元素根据html顺序，按照“后来居上”的规则层叠。</strong></p>
 <hr>
-<p><strong>eg.2：定位元素／行内元素／浮动元素之间的层叠关系</strong></p>
-<p><img src="http://labs.qiang.it/yetty/stack/z-index4.png" alt="eg.3"></p>
+<p><strong>eg.1-2：定位元素／行内元素／浮动元素之间的层叠关系</strong></p>
+<img src="/img/post/2015-11-18-stack-order/1-2-change-order.png">
 <p><strong>＊ 结论： 层叠顺序如下（高➡低）：</strong></p>
 <ul>
 <li><strong>z-index为auto的定位元素</strong></li>
@@ -269,7 +191,7 @@ var App = {
 <li>每个定位元素都有一个整型的层叠级别（stack level）；</li>
 <li>z-index属性只对定位元素有效。</li>
 </ol>
-<p><strong>eg.3-eg.4共同结构与样式:</strong> </p>
+<p><strong>eg.2-1/eg.2-2共同结构与样式:</strong> </p>
 <p>html:</p>
 <pre><code>&lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"div1"</span> style=<span class="string">"position:relative"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
 &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"div2"</span> style=<span class="string">"position:relative"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
@@ -283,12 +205,12 @@ var App = {
 <span class="class">.div3</span><span class="rules">{<span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#F9CCAD</span></span></span>;<span class="rule"><span class="attribute">margin</span>:<span class="value">-<span class="number">160px</span> <span class="number">40px</span></span></span>;}</span>
 <span class="class">.div4</span><span class="rules">{<span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#C7C7A8</span></span></span>;<span class="rule"><span class="attribute">margin</span>:<span class="value">-<span class="number">150px</span> <span class="number">60px</span></span></span>;}</span>
 <span class="class">.div5</span><span class="rules">{<span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#84AF9B</span></span></span>;<span class="rule"><span class="attribute">margin</span>:<span class="value">-<span class="number">140px</span> -<span class="number">10px</span></span></span>;}</span>
-</code></pre><p><strong>eg3: 5个定位元素在未设置z-index时的层叠情况</strong></p>
-<p><img src="http://labs.qiang.it/yetty/stack/z-index.png" alt="eg.3"></p>
+</code></pre><p><strong>eg.2-1: 5个定位元素在未设置z-index时的层叠情况</strong></p>
+<img src="/img/post/2015-11-18-stack-order/2-1-normal-order.png">
 <p><strong>＊ 结论： z-index为auto的定位元素根据html顺序，按照“后来居上”的规则层叠。</strong></p>
 <hr>
-<p><strong>eg4: 5个定位元素设置不同z-index时的层叠情况</strong></p>
-<p><img src="http://labs.qiang.it/yetty/stack/z-index2.png" alt="eg.4"></p>
+<p><strong>eg.2-2: 5个定位元素设置不同z-index时的层叠情况</strong></p>
+<img src="/img/post/2015-11-18-stack-order/2-2-change-order.png">
 <p><strong>＊ 结论：</strong></p>
 <ol>
 <li><strong>定位元素的层叠级别由z-index的值决定，z-index为auto则其层叠级别为0（注意：只是层级为0，其z-index值仍为auto）；</strong></li>
@@ -311,7 +233,7 @@ var App = {
 </blockquote>
 <p>规范中的描述比较乏味，可结合<a href="http://www.w3help.org/zh-cn/kb/013" target="_blank" rel="external">w3help</a>中的一张图片进行理解：</p>
 <blockquote>
-<p><img src="http://labs.qiang.it/yetty/stack/1.png" alt="stack-order"></p>
+<img src="/img/post/2015-11-18-stack-order/3-1-summay-order.png">
 </blockquote>
 <h2 id="4-_层叠上下文（stacking_context）" class="post-heading">4. 层叠上下文（stacking context）<a class="post-anchor" href="#4-_层叠上下文（stacking_context）" aria-hidden="true"></a></h2><p>看完上述的例子，对于层叠顺序应该大致了解了。</p>
 <p>但突然冒出一个“层叠上下文”，这又是个什么鬼？</p>
@@ -334,7 +256,7 @@ var App = {
 <li><strong>定位元素（absolute/relative）且z-index的值不为auto</strong></li>
 </ol>
 <p>注：在同一层叠上下文中，父元素、子元素与自身都被当作是并级关系进行层叠级别的比较。他们之间可能互相层叠。</p>
-<p><strong>eg.5：z-index为auto的定位元素没有创建层叠上下文</strong></p>
+<p><strong>eg.4-1：z-index为auto的定位元素没有创建层叠上下文</strong></p>
 <p>html:</p>
 <pre><code>&lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"div1"</span> style=<span class="string">"position:relative"</span>&gt;
     &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"div1_1"</span> style=<span class="string">"position:relative;z-index:9"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
@@ -345,7 +267,7 @@ var App = {
 <span class="class">.div1</span><span class="rules">{<span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#FF4363</span></span></span>;}</span>
 <span class="class">.div1_1</span><span class="rules">{<span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#FC9D99</span></span></span>;<span class="rule"><span class="attribute">margin</span>:<span class="value"><span class="number">100px</span> <span class="number">0</span> <span class="number">0</span> <span class="number">50px</span></span></span>;<span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">300px</span></span></span>;}</span>
 <span class="class">.div2</span><span class="rules">{<span class="rule"><span class="attribute">background-color</span>:<span class="value"> <span class="hexcolor">#F9CCAD</span></span></span>;<span class="rule"><span class="attribute">line-height</span>:<span class="value"> <span class="number">300px</span></span></span>;}</span>
-</code></pre><p><img src="http://labs.qiang.it/yetty/stack/css2.png" alt="eg.5"></p>
+</code></pre><img src="/img/post/2015-11-18-stack-order/4-1-normal-order.png">
 <p>分析上述例子：</p>
 <ul>
 <li>前提：<ol>
@@ -364,8 +286,8 @@ var App = {
 <p><strong>＊ 结论： z-index为auto的定位元素不会创建新的层叠上下文。</strong></p>
 <hr>
 <p><strong>IE中的BUG：</strong></p>
-<p>在IE6-7浏览器中测试eg.5：</p>
-<p><img src="http://labs.qiang.it/yetty/stack/ie.png" alt="eg.5 in IE"></p>
+<p>在IE6-7浏览器中测试eg.4-1：</p>
+<img src="/img/post/2015-11-18-stack-order/4-2-ie-bug.png">
 <p><strong>＊ 结论： ie6-7中，z-index为auto的定位元素也会创建新的层叠上下文。</strong></p>
 <h4 id="css3" class="post-heading">css3<a class="post-anchor" href="#css3" aria-hidden="true"></a></h4><hr>
 <blockquote>
@@ -399,8 +321,8 @@ var App = {
 <li><strong>元素的 -webkit-overflow-scrolling 属性被设置 “touch”</strong></li>
 </ul>
 <hr>
-<p><strong>eg.6：opacity创建新的层叠上下文</strong></p>
-<p><img src="http://labs.qiang.it/yetty/stack/opacity.png" alt="eg.6"></p>
+<p><strong>eg.4-2：opacity创建新的层叠上下文</strong></p>
+<img src="/img/post/2015-11-18-stack-order/4-3-opacity-order.png">
 <p>分析：</p>
 <blockquote>
 <p>If an element with opacity less than 1 is not positioned, implementations must paint the layer it creates, within its parent stacking context, at the same stacking order that would be used if it were a positioned element with ‘z-index: 0’ and ‘opacity: 1’. </p>
@@ -438,7 +360,7 @@ var App = {
 
     </div>
     <div class="post-revision">
-        <i class="fa fa-clock-o"></i> <time class="post-updated" datetime="2015-11-23T02:20:42.000Z" itemprop="dateModified">上次更新：星期一, 11月23日 2015 02:20:42</time>
+        <i class="fa fa-clock-o"></i> <time class="post-updated" datetime="2015-11-24T11:13:40.000Z" itemprop="dateModified">上次更新：星期二, 11月24日 2015 11:13:40</time>
     </div>
     
 <ul class="actions pagination pagination-post">
@@ -446,7 +368,7 @@ var App = {
     <li class="pagination-post-prev"><a href="/notes/2015/11/19/Git-Commands/" class="button big" title="Git常用操作总结"><i class="fa fa-chevron-left"></i> Git常用操作总结</a></li>
     
     
-    <li class="pagination-post-next"><a href="/notes/2015/11/18/phantomJs-crawler/" class="button big" title="基于phantomJs的网络爬虫"><i class="fa fa-chevron-right"></i> 基于phantomJs的网络爬虫</a></li>
+    <li class="pagination-post-next"><a href="/notes/2015/11/18/phantomJs-crawler/" class="button big" title="基于phantomJs的网络爬虫">基于phantomJs的网络爬虫 <i class="fa fa-chevron-right"></i></a></li>
     
 </ul>
 
@@ -491,7 +413,7 @@ var App = {
       Documentation licensed under <a href="http://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0</a>.
     </div>
     
-    <div class="site-stats">
+    <div class="site-stats" style="display:none">
         <span id="busuanzi_container_site_pv" class="site-pv">
             总访问量: <span id="busuanzi_value_site_pv" class="site-pv-num"></span> 次
         </span>
@@ -503,8 +425,95 @@ var App = {
 </footer>
 
 
-		
-		<!-- Scripts -->
+	</div>
+    
+    <section id="menu" class="slide-menu">
+
+    <!-- Search -->
+    <section>
+        <form class="search search-form" method="get">
+            <input type="text" name="query" placeholder="搜索" />
+        </form>
+    </section>
+
+    <section>
+        <ul class="links sm-links-aotu">
+        <li class="main-nav-item"><a href="/index.html" class="main-nav-link">首页</a></li><li class="main-nav-item active"><a href="/notes/" class="main-nav-link">时间轴</a></li><li class="main-nav-item"><a href="/tags/" class="main-nav-link">标签</a></li><li class="main-nav-item"><a href="/about/" class="main-nav-link">关于</a></li>
+        </ul>
+    </section>
+    <!-- Links -->
+    <section>
+        <ul class="links">
+            
+            <li>
+                <a href="https://jdc.jd.com">
+                    <h3>JDC</h3>
+                    <p>京东用户体验设计中心</p>
+                </a>
+            </li>
+            
+            <li>
+                <a href="https://tgideas.qq.com">
+                    <h3>TGIdeas</h3>
+                    <p>腾讯互娱市场部设计中心</p>
+                </a>
+            </li>
+            
+            <li>
+                <a href="https://isux.us">
+                    <h3>ISUX</h3>
+                    <p>腾讯SNG用户体验设计中心</p>
+                </a>
+            </li>
+            
+        </ul>
+    </section>
+
+    <!-- Actions -->
+    <section>
+        <ul class="actions vertical">
+            <li><a href="https://github.com/o2team" class="button big fit"><i class="fa fa-github"></i>Github</a></li>
+        </ul>
+    </section>
+</section>
+
+    <section id="smSearch" class="slide-search">
+
+<!-- Search -->
+    <section>
+        <form class="search search-form" method="get">
+            <input type="text" name="query" placeholder="搜索" />
+        </form>
+    </section>
+
+<!-- Links -->
+    <section>
+		<h3>搜索结果</h3>
+        <ul class="links" id="searchResults">Loading...</ul>
+    </section>
+
+</section>
+
+<script id="tplSearch" type="text/hogan-tpl">
+    {{#items}}
+    <li>
+        <a href="{{ url }}" target="_blank">
+            <h3>{{ title }}</h3>
+            {{#desc}}
+			<p>{{ desc }}</p>
+			{{/desc}}
+        </a>
+    </li>
+    {{/items}}
+</script>
+
+
+    
+	
+	<div class="back-to-top" id="backTop"><i class="fa fa-long-arrow-up"></i></div>
+	
+    
+    <!-- Scripts -->
 <!-- build:js js/dist.main.js -->
 <script src="/js/lunr.js" type="text/javascript"></script>
 <script src="/js/debounce.js" type="text/javascript"></script>
@@ -538,10 +547,6 @@ var App = {
 <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
 
 
-		
-	</div>
-	
-	<div class="back-to-top" id="backTop"><i class="fa fa-long-arrow-up"></i></div>
-	
+    
 </body>
 </html>
