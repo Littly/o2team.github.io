@@ -492,7 +492,7 @@
     <link href="http://aotu.io/notes/2015/11/20/101-percent/"/>
     <id>http://aotu.io/notes/2015/11/20/101-percent/</id>
     <published>2015-11-19T21:39:14.000Z</published>
-    <updated>2015-11-24T11:36:48.000Z</updated>
+    <updated>2015-11-26T01:56:01.000Z</updated>
     <content type="html"><![CDATA[<p><em>100%还原设计稿，还原误差不超1像素</em> 是重构工程师入行的最基本要求，而在实际工作中，这100%是远远不够的。</p>
 <p> 记得曾经带我的师傅说过一句话：</p>
 <blockquote>
@@ -500,7 +500,7 @@
 </blockquote>
 <p>101%还原是重构工程师在还原设计稿的过程中，发挥自身的主观能动性，对设计稿进行修正或向产品、视觉、交互提出合理的建议，让最终还原出来的视觉设计稿更接近设计本意。</p>
 <p>101%的还原可以归为两类，一类是<strong>对视觉稿的主动修正</strong>，不包括具有信息传达的内容；另一类是<strong>对视觉稿深入思考并提出合理建议</strong>，包括但不限于具有信息传达的内容。</p>
-<h3 id="对视觉稿的主动修正">对视觉稿的主动修正</h3><p>视觉设计师有时候会比较忙，设计稿中可能会出现像素之间的误差而造成不对齐的情况，如下面的设计稿：</p>
+<h2 id="对视觉稿的主动修正">对视觉稿的主动修正</h2><p>视觉设计师有时候会比较忙，设计稿中可能会出现像素之间的误差而造成不对齐的情况，如下面的设计稿：</p>
 <p><img src="http://missoy.me/wp-content/uploads/2015/07/img1.jpg" alt="image"></p>
 <p><em>（Retina 2X图）</em></p>
 <p>很明显，视觉设计师原意是想让右则的按钮垂直居中对齐的，我们在还原的时候可以去微调边距让之对齐，得到下面的重构稿：</p>
@@ -512,7 +512,7 @@
 <p><img src="http://missoy.me/wp-content/uploads/2015/07/img3.jpg" alt="image"></p>
 <p>那就产生了还原稿与设计原稿之间的信息传达内容了，因为方角和圆角是两个不一样的设计风格，圆角按钮明显不是视觉设计师的设计本意，如果圆角按钮在视觉设计师完全不知情的情况下上了线，那就是真正的不尊重视觉设计师的工作了。</p>
 <p>当然视觉设计师都希望自己输出的设计稿完美无缺，但一些客观因素（交接模块）或主观上的操作（工作太忙，拖动元素排版的时候手抖）难免会让设计稿存在一些像素级的误差，对视觉稿的主动修正，是和视觉设计师协作的一种默契，如果每一项这样的修正都要让视觉设计师重新去调整再生成新的PSD文件的话，沟通成本未免过高</p>
-<h3 id="对视觉稿深入思考并提出合理建议">对视觉稿深入思考并提出合理建议</h3><p>我们先看一下下面的设计稿：</p>
+<h2 id="对视觉稿深入思考并提出合理建议">对视觉稿深入思考并提出合理建议</h2><p>我们先看一下下面的设计稿：</p>
 <p><img src="http://missoy.me/wp-content/uploads/2015/07/img4.jpg" alt="image"></p>
 <p>从视觉稿来看，视觉设计师把“关注本店”、“关注公众号”和“联系卖家”这三项的按钮所占的区域作了等分处理，按钮里面的文案和icon水平居中</p>
 <p>等分的排版，虽然个体之间的内容不一样会出现内容与分隔线边距不相等的情况，但是在按钮所占展示区域比例相等的情况下，三个按钮整体看上去是非常整齐的，排版逻辑很清晰：</p>
@@ -572,15 +572,17 @@
 <p><em>（优化后的）</em></p>
 <p>这与原有的设计稿相比，扩展性更强，排版逻辑更严谨性、更趋向设计本意，建议是合理的。</p>
 <p>优化的地方虽然不大，但我们需要对设计稿进行认真深入的分析，从产品层面、视觉层面、开发层面甚至交互层面去尽可能地解读设计稿，深入思考才能发现问题，提出合理的建议，101% 中的 1% 威力就会慢慢的程现出来。</p>
-<h4 id="一个特殊的例子">一个特殊的例子</h4><p><img src="http://missoy.me/wp-content/uploads/2015/07/img17.jpg" alt="image"></p>
+<h3 id="一个特殊的例子">一个特殊的例子</h3><p><img src="http://missoy.me/wp-content/uploads/2015/07/img17.jpg" alt="image"></p>
 <p>由于项目快速迭代，视觉设计资源紧缺的原因，于是有了这张没有经过视觉流程的设计稿，是一位产品GG给到的，如果我们拿到设计稿，不加以思考的话，100%还原出来，那么</p>
 <p>得到了第一稿：</p>
 <p><img src="http://missoy.me/wp-content/uploads/2015/07/img18.jpg" alt="image"></p>
 <p>其实认真思考一下，可优化的地方还是有的：</p>
-<h5 id="交互上">交互上</h5><ul>
+<p><strong>交互上</strong></p>
+<ul>
 <li><img src="http://missoy.me/wp-content/uploads/2015/07/img19.jpg" alt="image"> 和 <img src="http://missoy.me/wp-content/uploads/2015/07/img20.jpg" alt="image"> 这两个其实只是文案中的一部分，并没有任何交互，设计稿上却做成了和文本形成强烈对比的看上去可点击的按钮，容易误导用户去点</li>
 </ul>
-<h5 id="视觉上">视觉上</h5><ul>
+<p><strong>视觉上</strong></p>
+<ul>
 <li><p>复制按钮的配色欠恰当，复制的操作并不会引起用户警告或错误的提示，而红色恰好有让人警惕的意味</p>
 </li>
 <li><p>输入框和复制按钮的高度不一样，显得不够整齐美观</p>
@@ -604,7 +606,8 @@
 <p><img src="http://missoy.me/wp-content/uploads/2015/07/img21.jpg" alt="image"></p>
 <p><em>（第二稿）</em></p>
 <p>第二稿中“您已收藏店铺，可在个人中心查看”的收藏反馈提示是产品新增的内容，一开始要求放在上图的位置，虽然第二稿在交互和视觉上得到了一定的优化，但还有优化的空间，特别是</p>
-<h5 id="产品上">产品上</h5><ul>
+<p><strong>产品上</strong></p>
+<ul>
 <li>文字左对齐可显页面排版整齐，但从内容的亲密性上看，最底部的已收藏文字反馈提示并不属于引导操作的内容</li>
 </ul>
 <p>最终建议：</p>
@@ -637,13 +640,13 @@
     <link href="http://aotu.io/notes/2015/11/19/Git-Commands/"/>
     <id>http://aotu.io/notes/2015/11/19/Git-Commands/</id>
     <published>2015-11-19T12:44:25.000Z</published>
-    <updated>2015-11-20T07:48:45.000Z</updated>
+    <updated>2015-11-26T08:20:54.000Z</updated>
     <content type="html"><![CDATA[<p>用Git比较久了，之前一直在Win用的TortoiseGit，现在命令行用的比较多，所以把一些指令总结一下，以便回顾和查询。<br>理解这些指令，觉得最重要的是理解Git的内部原理，比如Git的分布式版本控制，分清楚工作区、暂存区、版本库，还有就是理解Git跟踪并管理的是修改，而非文件。</p>
 <a id="more"></a>
 <h3 id="设置">设置</h3><pre><code>$ git config --global user<span class="class">.name</span> <span class="string">"Your Name"</span>
 $ git config --global user<span class="class">.email</span> <span class="string">"email@example.com"</span>
 </code></pre><h3 id="提交">提交</h3><p>git tracked的是修改，而不是文件</p>
-<p><img src="/img/post/git-trees.jpg" alt="git-track"></p>
+<p><img src="/img/post/mamboer/git-trees.jpg" alt="git-track"></p>
 <pre><code><span class="comment">#将“当前修改”移动到暂存区(stage)</span>
 <span class="variable">$ </span>git add somfile.txt
 <span class="comment">#将暂存区修改提交</span>
@@ -674,7 +677,7 @@ $ git push -u origin <span class="keyword">master</span>
 <span class="title">$</span> git push origin <span class="literal">master</span>
 </code></pre><h3 id="克隆">克隆</h3><pre><code>$ git clone https:<span class="comment">//github.com/Yikun/yikun.github.com.git path</span>
 $ git clone git@github<span class="class">.com</span>:Yikun/yikun<span class="class">.github</span><span class="class">.com</span><span class="class">.git</span> path
-</code></pre><h3 id="分支操作">分支操作</h3><p><img src="/img/post/git-merge.png" alt="about-merge"></p>
+</code></pre><h3 id="分支操作">分支操作</h3><p><img src="/img/post/mamboer/git-merge.png" alt="about-merge"></p>
 <pre><code><span class="comment"># 查看当前分支</span>
 <span class="variable">$ </span>git branch
 
@@ -1051,11 +1054,11 @@ $ git push origin --tags
     <link href="http://aotu.io/notes/2015/11/18/flash-canvas/"/>
     <id>http://aotu.io/notes/2015/11/18/flash-canvas/</id>
     <published>2015-11-17T18:44:25.000Z</published>
-    <updated>2015-11-24T12:55:36.000Z</updated>
+    <updated>2015-11-26T03:14:13.000Z</updated>
     <content type="html"><![CDATA[<h2 id="介绍">介绍</h2><p>flash可以导出canvas动画，大大缩短制作动画所需要的时间。它是可视化IDE，可以让我们写少很多代码。做出来的动画，可以更加精确。</p>
 <h3 id="新建HTML5_Canvas项目">新建HTML5 Canvas项目</h3><p><img src="http://b.gengshu.net/doc/flash/img/1.png" alt="img1"></p>
 <h3 id="舞台设置">舞台设置</h3><p>舞台大小修改为：600x600 (<em>这里可以根据设计稿调整所需要的舞台大小</em>)</p>
-<h4 id="帧频">帧频</h4><p>是指每秒钟放映或显示的帧或图像的数量，这个数值设置越大，动画越快，但同时也是性能消耗大户。这里我们设置为36</p>
+<h3 id="帧频">帧频</h3><p>是指每秒钟放映或显示的帧或图像的数量，这个数值设置越大，动画越快，但同时也是性能消耗大户。这里我们设置为36</p>
 <p><img src="http://b.gengshu.net/doc/flash/img/2.png" alt="img2"></p>
 <h3 id="导入资源">导入资源</h3><p>文件 &gt; 导入 &gt; 导入到库</p>
 <h3 id="布局">布局</h3><p>快捷键Ctrl + L或者窗口菜单下 &gt; 库</p>
@@ -1089,12 +1092,12 @@ $ git push origin --tags
 </ul>
 <h4 id="资源导出选项">资源导出选项</h4><ul>
 <li>图像(<em>是否导出雪碧图</em>)</li>
-<li>javascript命名空间(<em>基本上不需要修改</em>)，这几个属于全局变量，可以在发布后的js文件中，再修改。</li>
+<li>javascript命名空间(<em>基本上不需要修改</em>)，这几个属于全局变量，可以在发布后的js文件中再修改。</li>
 </ul>
 <p><img src="http://b.gengshu.net/doc/flash/img/8.png" alt="img8"></p>
 <h4 id="生成html">生成html</h4><p>最终会生成一个html文件和一个js文件</p>
 <h4 id="生成的html文件">生成的html文件</h4><ul>
-<li>框架自带的preloadjs,可以轻松管理资源预加载，可以做关loading操作，提供了相关api进行操作。</li>
+<li>框架自带的preloadjs,可以轻松管理资源预加载，它提供了相关api可以进行loading等操作。</li>
 </ul>
 <p><img src="http://b.gengshu.net/doc/flash/img/9.png" alt="img9"></p>
 <h4 id="生成的js文件">生成的js文件</h4><ul>
@@ -1167,13 +1170,11 @@ $ git push origin --tags
     <link href="http://aotu.io/notes/2015/11/16/vim-list/"/>
     <id>http://aotu.io/notes/2015/11/16/vim-list/</id>
     <published>2015-11-16T10:24:35.000Z</published>
-    <updated>2015-11-19T09:54:36.000Z</updated>
-    <content type="html"><![CDATA[<p>##前言</p>
-<blockquote>
+    <updated>2015-11-26T07:35:12.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="前言">前言</h2><blockquote>
 <p>选择你所喜欢的，爱你所选择的–列夫·托尔斯泰</p>
 </blockquote>
-<p>###不是理由的理由</p>
-<p>用了几年Vim，我发现我越来越喜欢它了，和好多人一样喜欢它，也许喜欢的理由各不相同，但大抵有如下几个：</p>
+<h3 id="不是理由的理由">不是理由的理由</h3><p>用了几年Vim，我发现我越来越喜欢它了，和好多人一样喜欢它，也许喜欢的理由各不相同，但大抵有如下几个：</p>
 <ul>
 <li>即使你用了几年了，你还是会在某天惊呼原来还可以这么操作，<strong>它总会给你带来惊喜</strong>。</li>
 <li>当你要操作的时候你根本不用去想那些快捷键(也许不能叫快捷键，它是谓语{operator}和宾语{text-objects}，组合在一起形成不同指令,好像自然语言)，它们就在你意识里。也许开始的时候你需要去记一些快捷键（别的编辑器不用吗？），但记住以后你熟练了，就像是骑自行车，你就忘记它的存在，你只用输出你的思想，<strong>它让你更专注你要做的事情本身</strong>。</li>
@@ -1250,20 +1251,17 @@ $ git push origin --tags
 </table>
 <p>以上的这些操作都是直接在键盘上操作的，没有用鼠标。</p>
 <p>喜欢一个人的时候总能说出好多的理由，而不喜欢却只需要一个理由。此时我赞美我的女神你也在心里列举了你心中女神的诸多可爱美丽特点。所以可以想象各种关于编辑器文章下的各种互喷吐槽，即使是同一个编辑器的文章下也不免相互吐槽，毕竟不同人理念也是不一样的。</p>
-<p>###有所为有所不为</p>
-<p>vim是个高效的文本编辑器，在文本编辑这一领域可谓是独步天下，高手<a href="http://zhuanlan.zhihu.com/vim-non-programming/19918627" target="_blank" rel="external">使用vim处理SRT字幕内容</a>，痴迷者除了使用vim写代码、<a href="http://www.vimer.cn?p=1222" target="_blank" rel="external">发邮件</a>、<a href="http://bluegene8210.is-programmer.com/posts/67910.html" target="_blank" rel="external">看股票</a>、写博客、写markdown(这篇文章就是vim写的markdown)还<a href="http://www.iplaysoft.com/vimium-and-vimperator.html" target="_blank" rel="external">使用vim浏览网页</a>，普通人可以把它作为<a href="http://blog.sina.com.cn/s/blog_45dac66f010005kw.html" target="_blank" rel="external">普通人的编辑利器</a>。在文本编辑领域，后来者只有模仿而无法超越vim。小李飞刀独步天下却也砍不了骨头，在代码编程领域，公认的最适合的场景是做Unix/Linux服务器编程,不用下载服务器端的文件而直接修改；其次是编写html/css/javascript/shell/python/c等；最后在mac、linux下要改文件用系统带的vim随手改改。而编写Java<br>EE、Objective-C等还是用Eclipse、XCode等IDE的比较好。</p>
-<p>###君子性非异也，善假于物也<br>vim只是一个工具而已，它并不能让你码代码的能力提升，只能帮你更快速地输出你的思维。每一个工具都有它特定的场景，聪明的人总会在适当的场景做出合适的选择。好多人都说学习起来好难的呀，投入的成本换来的收益是不是成正比的呢？我觉得还是值得的，上面也说过，它是万变中的不变，同时它真的是个高效的工具，另外也许最后出来的高效的编辑外还带给你一些东西，比如好奇发现带来的惊喜，又如你发现你用了几年还有好多不会的谦虚，还有用宏解决了一个棘手问题的喜悦。最后它只是一个工具，是雕刻林诗音松木人像的小刀，或是冠绝武林的小李飞刀，关键在人。</p>
-<p>###不积跬步无以至千里<br>佛渡有缘人，细想这个‘有缘人’还挺有意思的，其实就是信的人，不信的说再多也是没有用的。如果想学，不必卸载你的是编辑器，做出破釜沉舟之势，万一用了两天觉得不方便或是有紧急的要修改的内容，要换回来用熟悉的编辑器。另外也不要觉得一时学不会就感觉挫折，毕竟很多东西都不可一蹴而就的，需要一点积累，所以慢慢来的。那些《7天XX》《21精通XX》真的害了好多人，慢慢来，实在不行认为自己笨了，不还有勤能补拙吗？好多的编辑器都有vi插件或模式，你可以找一找然后装上试试的，等熟悉了觉得不满足了再换成vim，要是觉得一直用vi插件也不错的就一直用着，能解决问题的顺手的才是最高效的。</p>
-<p>###选择你所喜欢的，爱你所选择的<br>我在小学的时候搞了个小霸王说要学习五笔，然后字根没有背完就忘记了，大学时候再一个想起这个事决定再学五笔，然后没有几天又放弃了，毕业两年后想起学五笔这个事，心里有个结，于是又学起来了，然后一直在用，虽然是五笔混合模式，偶尔也用纯五笔模式。vim就是在我可以用五笔的时候开始学的，当时拿同事的vimrc来直接就用了，现在也在用的，只是改了少许的地方，一直在够用就好的状态，然后在用的时候觉得有什么不自然的地方就找一下答案的，慢慢地越来越顺手了。细想我这个慢方法还是可取的，那么多我的命令我只会我常用的十几个，但那也是够用的了，并且是越来越喜欢，看着别人用的也还常发现还有很多不会的东西。</p>
-<p>再回首，一切是那样自然，一如vim的理念keep it<br>simple，我也只装了平时常用的几个插件，还有一些比较强大的插件也没有用得着，所以没有装上。最近为了给同事们讲一下vim,才意识到虽然平时说vim有几个模式，但是用的时候自己也没有区分得很清楚，觉得就是一个整体，应该那样，有时候我们只是为了区分和认识一个东西才把它解构了，就像一首好的歌曲，我们只用觉得好听，那些乐评人说的为什么好感觉都很有道理。vim命令有多难记也还是有逻辑的；vim里可以快速精确的查找定位；vim真的好像一切文本皆对象，操作针对字符，词，行，块，文件这些对象；vim的设计哲学是如果你的工作只需要做一次，那没问题，怎么搞都行，如果你的工作是要重复地完成某些工作，则vim总可以帮你找到更少的按键方式来实现相同的目标。如<a href="http://vimgolf.com/" target="_blank" rel="external">VimGolf</a>所说Real Vim ninjas count every keystroke - do you?</p>
+<h3 id="有所为有所不为">有所为有所不为</h3><p>vim是个高效的文本编辑器，在文本编辑这一领域可谓是独步天下，高手<a href="http://zhuanlan.zhihu.com/vim-non-programming/19918627" target="_blank" rel="external">使用vim处理SRT字幕内容</a>，痴迷者除了使用vim写代码、<a href="http://www.vimer.cn?p=1222" target="_blank" rel="external">发邮件</a>、<a href="http://bluegene8210.is-programmer.com/posts/67910.html" target="_blank" rel="external">看股票</a>、写博客、写markdown(这篇文章就是vim写的markdown)还<a href="http://www.iplaysoft.com/vimium-and-vimperator.html" target="_blank" rel="external">使用vim浏览网页</a>，普通人可以把它作为<a href="http://blog.sina.com.cn/s/blog_45dac66f010005kw.html" target="_blank" rel="external">普通人的编辑利器</a>。在文本编辑领域，后来者只有模仿而无法超越vim。小李飞刀独步天下却也砍不了骨头，在代码编程领域，公认的最适合的场景是做Unix/Linux服务器编程,不用下载服务器端的文件而直接修改；其次是编写html/css/javascript/shell/python/c等；最后在mac、linux下要改文件用系统带的vim随手改改。而编写Java<br>EE、Objective-C等还是用Eclipse、XCode等IDE的比较好。</p>
+<h3 id="君子性非异也，善假于物也">君子性非异也，善假于物也</h3><p>vim只是一个工具而已，它并不能让你码代码的能力提升，只能帮你更快速地输出你的思维。每一个工具都有它特定的场景，聪明的人总会在适当的场景做出合适的选择。好多人都说学习起来好难的呀，投入的成本换来的收益是不是成正比的呢？我觉得还是值得的，上面也说过，它是万变中的不变，同时它真的是个高效的工具，另外也许最后出来的高效的编辑外还带给你一些东西，比如好奇发现带来的惊喜，又如你发现你用了几年还有好多不会的谦虚，还有用宏解决了一个棘手问题的喜悦。最后它只是一个工具，是雕刻林诗音松木人像的小刀，或是冠绝武林的小李飞刀，关键在人。</p>
+<h3 id="不积跬步无以至千里">不积跬步无以至千里</h3><p>佛渡有缘人，细想这个‘有缘人’还挺有意思的，其实就是信的人，不信的说再多也是没有用的。如果想学，不必卸载你的是编辑器，做出破釜沉舟之势，万一用了两天觉得不方便或是有紧急的要修改的内容，要换回来用熟悉的编辑器。另外也不要觉得一时学不会就感觉挫折，毕竟很多东西都不可一蹴而就的，需要一点积累，所以慢慢来的。那些《7天XX》《21精通XX》真的害了好多人，慢慢来，实在不行认为自己笨了，不还有勤能补拙吗？好多的编辑器都有vi插件或模式，你可以找一找然后装上试试的，等熟悉了觉得不满足了再换成vim，要是觉得一直用vi插件也不错的就一直用着，能解决问题的顺手的才是最高效的。</p>
+<h3 id="选择你所喜欢的，爱你所选择的">选择你所喜欢的，爱你所选择的</h3><p>我在小学的时候搞了个小霸王说要学习五笔，然后字根没有背完就忘记了，大学时候再一个想起这个事决定再学五笔，然后没有几天又放弃了，毕业两年后想起学五笔这个事，心里有个结，于是又学起来了，然后一直在用，虽然是五笔混合模式，偶尔也用纯五笔模式。vim就是在我可以用五笔的时候开始学的，当时拿同事的vimrc来直接就用了，现在也在用的，只是改了少许的地方，一直在够用就好的状态，然后在用的时候觉得有什么不自然的地方就找一下答案的，慢慢地越来越顺手了。细想我这个慢方法还是可取的，那么多我的命令我只会我常用的十几个，但那也是够用的了，并且是越来越喜欢，看着别人用的也还常发现还有很多不会的东西。</p>
+<p>再回首，一切是那样自然，一如vim的理念keep it simple，我也只装了平时常用的几个插件，还有一些比较强大的插件也没有用得着，所以没有装上。最近为了给同事们讲一下vim,才意识到虽然平时说vim有几个模式，但是用的时候自己也没有区分得很清楚，觉得就是一个整体，应该那样，有时候我们只是为了区分和认识一个东西才把它解构了，就像一首好的歌曲，我们只用觉得好听，那些乐评人说的为什么好感觉都很有道理。vim命令有多难记也还是有逻辑的；vim里可以快速精确的查找定位；vim真的好像一切文本皆对象，操作针对字符，词，行，块，文件这些对象；vim的设计哲学是如果你的工作只需要做一次，那没问题，怎么搞都行，如果你的工作是要重复地完成某些工作，则vim总可以帮你找到更少的按键方式来实现相同的目标。如<a href="http://vimgolf.com/" target="_blank" rel="external">VimGolf</a>所说Real Vim ninjas count every keystroke - do you?  </p>
 ]]></content>
     <summary type="html">
-    <![CDATA[<p>##前言</p>
-<blockquote>
+    <![CDATA[<h2 id="前言">前言</h2><blockquote>
 <p>选择你所喜欢的，爱你所选择的–列夫·托尔斯泰</p>
 </blockquote>
-<p>###不是理由的理由</p>
-<p>用了几年Vim，我发现我越来越喜欢它了，和好多人一样喜欢它，也许喜欢的理由各不相同，但大抵有如下几个]]>
+<h3 id="不是理由的理由">不是理由的理由</h3><p>用了几年Vim，我发现我越来越喜欢它了，和好多人一样喜欢它，也许]]>
     </summary>
     
       <category term="Vim" scheme="http://aotu.io/tags/Vim/"/>
