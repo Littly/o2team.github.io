@@ -171,7 +171,7 @@
     <link href="http://aotu.io/notes/2015/11/23/css3-animation-to-movie-part_2/"/>
     <id>http://aotu.io/notes/2015/11/23/css3-animation-to-movie-part_2/</id>
     <published>2015-11-22T17:27:00.000Z</published>
-    <updated>2015-11-23T02:20:42.000Z</updated>
+    <updated>2015-12-01T02:57:53.000Z</updated>
     <content type="html"><![CDATA[<h1 id="以电影之眼看CSS3动画（二）">以电影之眼看CSS3动画（二）</h1><hr>
 <pre><code>注：此文非干货聚集地，来找干货的对不住了。
 </code></pre><p>上回说到CSS3动画与传统动画之间千丝万缕的联系，现在就让我们来探讨一下用CSS3动画做一部动画电影都需要些什么。</p>
@@ -248,16 +248,16 @@
 <h2 id="参考资料：">参考资料：</h2><ul>
 <li><p><a href="http://www.amazon.cn/%E5%8A%A8%E7%94%BB%E7%9A%84%E6%97%B6%E9%97%B4%E6%8E%8C%E6%8F%A1-%E5%93%88%E7%BD%97%E5%BE%B7%E2%80%A2%E5%A8%81%E7%89%B9%E5%85%8B/dp/B0094N5III/ref=sr_1_1?ie=UTF8&amp;qid=1420369719&amp;sr=8-1&amp;keywords=%E5%8A%A8%E7%94%BB%E7%9A%84%E6%97%B6%E9%97%B4%E6%8E%8C%E6%8F%A1" target="_blank" rel="external">《动画的时间掌握（修订版）》</a>[英]哈罗德•威特克；[英]约翰•哈拉斯；[美]汤姆•赛图</p>
 </li>
-<li><p>The Art of UI Animations <a href="http://markgeyer.com/pres/the-art-of-ui-animations/#/" target="_blank" rel="external">http://markgeyer.com/pres/the-art-of-ui-animations/#/</a> </p>
+<li><p><a href="http://markgeyer.com/pres/the-art-of-ui-animations/#/" target="_blank" rel="external">The Art of UI Animations</a> </p>
 </li>
 </ul>
 <h2 id="推荐：">推荐：</h2><ul>
-<li><p>ISUX动画工具、动画手册 <a href="ttp://isux.tencent.com/css3/tools.html" target="_blank" rel="external">http://isux.tencent.com/css3/tools.html</a></p>
+<li><p><a href="ttp://isux.tencent.com/css3/tools.html" target="_blank" rel="external">ISUX动画工具、动画手册</a></p>
 <blockquote>
 <p>了解所有与CSS3动画相关的属性，使用动画工具更直观地调整变形。</p>
 </blockquote>
 </li>
-<li><p>12 Principles of Animation <a href="http://minyos.its.rmit.edu.au/aim/a_notes/anim_principles.html" target="_blank" rel="external">http://minyos.its.rmit.edu.au/aim/a_notes/anim_principles.html</a></p>
+<li><p><a href="http://minyos.its.rmit.edu.au/aim/a_notes/anim_principles.html" target="_blank" rel="external">12 Principles of Animation</a></p>
 <blockquote>
 <p>最近存在感极强的动画12原则，如果想要做出自然流畅的CSS3动画，这个由迪士尼动画巨头所总结出的经典原则绝对是必读之物。这里附上视频版：<a href="http://vimeo.com/93206523" target="_blank" rel="external">http://vimeo.com/93206523</a></p>
 </blockquote>
@@ -943,7 +943,7 @@ $ git push origin --tags
     <link href="http://aotu.io/notes/2015/11/18/phantomJs-crawler/"/>
     <id>http://aotu.io/notes/2015/11/18/phantomJs-crawler/</id>
     <published>2015-11-18T09:59:33.000Z</published>
-    <updated>2015-11-19T10:06:29.000Z</updated>
+    <updated>2015-12-01T02:37:42.000Z</updated>
     <content type="html"><![CDATA[<h1 id="基于phantomJs2-0的网络爬虫">基于phantomJs2.0的网络爬虫</h1><p><strong>phantomJs</strong>是一个基于WebKit的服务器端JavaScript API。它全面支持web而不需浏览器支持，其快速，原生支持各种Web标准： DOM 处理, CSS 选择器, JSON, Canvas, 和 SVG。PhantomJS可以用于页面自动化，网络监测，网页截屏，以及无界面测试等。</p>
 <h3 id="用途概述：">用途概述：</h3><ul>
 <li><strong>屏幕快照</strong> ：官方提供的API中<a href="http://phantomjs.org/api/webpage/method/render.html" target="_blank" rel="external">page.render</a> 提供了强大的屏幕快照功能；</li>
@@ -1054,61 +1054,62 @@ $ git push origin --tags
     <link href="http://aotu.io/notes/2015/11/18/flash-canvas/"/>
     <id>http://aotu.io/notes/2015/11/18/flash-canvas/</id>
     <published>2015-11-17T18:44:25.000Z</published>
-    <updated>2015-11-26T03:14:13.000Z</updated>
-    <content type="html"><![CDATA[<h2 id="介绍">介绍</h2><p>flash可以导出canvas动画，大大缩短制作动画所需要的时间。它是可视化IDE，可以让我们写少很多代码。做出来的动画，可以更加精确。</p>
-<h3 id="新建HTML5_Canvas项目">新建HTML5 Canvas项目</h3><p><img src="http://b.gengshu.net/doc/flash/img/1.png" alt="img1"></p>
+    <updated>2015-12-01T05:38:20.000Z</updated>
+    <content type="html"><![CDATA[<p>flash可以导出canvas动画，大大缩短制作动画所需要的时间。它是一个可视化IDE，可以让我们写少很多代码。做出来的动画，可以更加精确。同时，可以通用使用帧脚本中的 Javascript，为资源添加交互性。</p>
+<a id="more"></a>
+<h2 id="新建HTML5_Canvas项目">新建HTML5 Canvas项目</h2><img src="/img/post/youing/1.png">
 <h3 id="舞台设置">舞台设置</h3><p>舞台大小修改为：600x600 (<em>这里可以根据设计稿调整所需要的舞台大小</em>)</p>
 <h3 id="帧频">帧频</h3><p>是指每秒钟放映或显示的帧或图像的数量，这个数值设置越大，动画越快，但同时也是性能消耗大户。这里我们设置为36</p>
-<p><img src="http://b.gengshu.net/doc/flash/img/2.png" alt="img2"></p>
-<h3 id="导入资源">导入资源</h3><p>文件 &gt; 导入 &gt; 导入到库</p>
-<h3 id="布局">布局</h3><p>快捷键Ctrl + L或者窗口菜单下 &gt; 库</p>
+<img src="/img/post/youing/2.png">
+<h2 id="导入资源">导入资源</h2><p>文件 &gt; 导入 &gt; 导入到库</p>
+<h2 id="布局">布局</h2><p>快捷键Ctrl + L或者窗口菜单下 &gt; 库</p>
 <p>从资源库中把资源拖到舞台进去,通过移动拖拽的形式进行布局</p>
-<p><img src="http://b.gengshu.net/doc/flash/img/3.png" alt="img3"></p>
-<h3 id="图形与影片剪辑">图形与影片剪辑</h3><p>我们可以将单独的动画，放到一个独立的影片剪辑里，这样可以更好的控制动画。几个独立的剪片剪辑，可以组成一个完整的动画。</p>
+<img src="/img/post/youing/3.png">
+<h2 id="图形与影片剪辑">图形与影片剪辑</h2><p>我们可以将单独的动画，放到一个独立的影片剪辑里，这样可以更好的控制动画。几个独立的剪片剪辑，可以组成一个完整的动画。</p>
 <p>当我们把图片从资源库拖到舞台时，它这个时候，只是普通的位图，并不能做补帧动画，所以我们必须把它转换成元件。</p>
 <ul>
-<li><strong>图形</strong>只是单独一帧</li>
-<li><strong>影片剪辑</strong>可以有多帧，可以放至多个图形</li>
+<li><strong>图形</strong>由矢量图或者是位图组成。</li>
+<li><strong>影片剪辑</strong>包含在动画影片中的影片片段，有自己的时间轴和属性。具有交互性，是用途最广、功能最多的部分。</li>
 </ul>
 <p>下面制作以飘动的钱，做个例子说明</p>
 <p>选择位图，右键 &gt; 转换为元件，这个时候，弹出一个对话窗口，我们首先选择“影片剪辑”，保存。双击进入刚才创始的影片剪辑，这个时候，由于刚才我们只是把位图转成了影片剪辑，但实际上，它里面，仍然是一个位图，所以并不能做动画操作。所以我们需要在影片剪辑里，把图片转换了“图形”。</p>
-<p><img src="http://b.gengshu.net/doc/flash/img/4.png" alt="img4"></p>
-<h3 id="时间轴">时间轴</h3><p>上面已经把图片转成图形元件，所以我们现在需要时间轴某个地方中插入关键帧。这里我们在30,60帧处插入关键帧。然后在30帧处，移动元件的位置，然后在每个关键帧的中间右键，选择“创建传统补间”。速度可以通过删除或者增加两个关键帧的补间动画时间长度来控制。</p>
-<p><img src="http://b.gengshu.net/doc/flash/img/5.png" alt="img5"></p>
-<p><img src="http://b.gengshu.net/doc/flash/img/6.png" alt="img6"></p>
-<h3 id="动作播放控制">动作播放控制</h3><p>如果我们希望动画可以连续从头再播放，可以在动画的最后一帧插入一个空白关键帧，打开动作面板，然后写上</p>
+<img src="/img/post/youing/4.png">
+<h2 id="时间轴">时间轴</h2><p>上面已经把图片转成图形元件，所以我们现在需要时间轴某个地方中插入关键帧。这里我们在30,60帧处插入关键帧。然后在30帧处，移动元件的位置，然后在每个关键帧的中间右键，选择“创建传统补间”。速度可以通过删除或者增加两个关键帧的补间动画时间长度来控制。</p>
+<img src="/img/post/youing/5.png">
+<img src="/img/post/youing/6.png">
+<h2 id="动作播放控制">动作播放控制</h2><p>如果我们希望动画可以连续从头再播放，可以在动画的最后一帧插入一个空白关键帧，打开动作面板，然后写上</p>
 <pre><code>this.<span class="function"><span class="title">gotoAndPlay</span><span class="params">(<span class="number">0</span>)</span></span>
-</code></pre><p><img src="http://b.gengshu.net/doc/flash/img/7.png" alt="img7"></p>
+</code></pre><img src="/img/post/youing/7.png">
 <p>即可回到第一帧重新播放，如果希望停止动画，则</p>
 <pre><code><span class="keyword">this</span>.stop();
 </code></pre><p>如果希望跳到某帧去播放</p>
 <pre><code>this.<span class="function"><span class="title">gotoAndPlay</span><span class="params">(n)</span></span>
 </code></pre><p>如果希望跳到某帧并停止</p>
 <pre><code>this.<span class="function"><span class="title">gotoAndStop</span><span class="params">(n)</span></span>
-</code></pre><h3 id="发布">发布</h3><p>文件 &gt; 发布设置</p>
-<h4 id="文件输出">文件输出</h4><ul>
+</code></pre><h2 id="发布">发布</h2><p>文件 &gt; 发布设置</p>
+<h3 id="文件输出">文件输出</h3><ul>
 <li>循环时间轴(<em>表示是否循环整个动画</em>)</li>
 <li>覆盖HTML(<em>第一次发布时可以选上，如果对html有修改，记得把这个选项去掉,否则会对文件进行覆盖操作</em>)</li>
 </ul>
-<h4 id="资源导出选项">资源导出选项</h4><ul>
+<h3 id="资源导出选项">资源导出选项</h3><ul>
 <li>图像(<em>是否导出雪碧图</em>)</li>
 <li>javascript命名空间(<em>基本上不需要修改</em>)，这几个属于全局变量，可以在发布后的js文件中再修改。</li>
 </ul>
-<p><img src="http://b.gengshu.net/doc/flash/img/8.png" alt="img8"></p>
-<h4 id="生成html">生成html</h4><p>最终会生成一个html文件和一个js文件</p>
-<h4 id="生成的html文件">生成的html文件</h4><ul>
+<img src="/img/post/youing/8.png">
+<h3 id="生成html">生成html</h3><p>最终会生成一个html文件和一个js文件</p>
+<h3 id="生成的html文件">生成的html文件</h3><ul>
 <li>框架自带的preloadjs,可以轻松管理资源预加载，它提供了相关api可以进行loading等操作。</li>
 </ul>
-<p><img src="http://b.gengshu.net/doc/flash/img/9.png" alt="img9"></p>
-<h4 id="生成的js文件">生成的js文件</h4><ul>
+<img src="/img/post/youing/9.png">
+<h3 id="生成的js文件">生成的js文件</h3><ul>
 <li>生成的动画配置及脚本都在这个js文件里面，如果需要，可以手动修改相关数据。</li>
 </ul>
-<p><img src="http://b.gengshu.net/doc/flash/img/10.png" alt="img10"></p>
-<h4 id="附上最终效果">附上最终效果</h4><p><a href="http://b.gengshu.net/doc/flash/people.html" target="_blank" rel="external">点我看效果</a></p>
+<img src="/img/post/youing/10.png">
+<h2 id="附上最终效果">附上最终效果</h2><p><a href="http://b.gengshu.net/doc/flash/people.html" target="_blank" rel="external">点我看效果</a></p>
 ]]></content>
     <summary type="html">
-    <![CDATA[<h2 id="介绍">介绍</h2><p>flash可以导出canvas动画，大大缩短制作动画所需要的时间。它是可视化IDE，可以让我们写少很多代码。做出来的动画，可以更加精确。</p>
-<h3 id="新建HTML5_Canvas项目">新建HTML5 Canvas项目</h]]>
+    <![CDATA[<p>flash可以导出canvas动画，大大缩短制作动画所需要的时间。它是一个可视化IDE，可以让我们写少很多代码。做出来的动画，可以更加精确。同时，可以通用使用帧脚本中的 Javascript，为资源添加交互性。</p>]]>
+    
     </summary>
     
       <category term="Canvas" scheme="http://aotu.io/tags/Canvas/"/>
@@ -1269,11 +1270,11 @@ $ git push origin --tags
   </entry>
   
   <entry>
-    <title></title>
+    <title><![CDATA[探究transform动画元素的z-index]]></title>
     <link href="http://aotu.io/notes/2015/11/16/z-index-and-translate3d/"/>
     <id>http://aotu.io/notes/2015/11/16/z-index-and-translate3d/</id>
     <published>2015-11-16T00:24:35.000Z</published>
-    <updated>2015-11-23T02:20:42.000Z</updated>
+    <updated>2015-12-01T05:18:06.000Z</updated>
     <content type="html"><![CDATA[<h2 id="z-index_和_translate3d">z-index 和 translate3d</h2><p>在一次需求中，需要做出三张卡牌走马灯式滚动的效果，由于在前面的一张卡牌需要挡住后面的卡牌，自然而然地就用 z-index 使前面的卡牌显示在最上面，配以 transform 动画让“走马灯”滚起来，在开发过程中，在 PC 侧 Chrome 中表现良好，在本人手机浏览器中也表现良好，最后测试时却发现，在微信客户端或 QQ 客户端中打开页面出现问题，“走马灯”滚动时，卡牌先通过 transform 就位后，才把 z-index 设置较大的卡牌置于上面，感觉上非常的不流畅。</p>
 <p><img src="http://labs.qiang.it/manjiz/postimgs/2015/151116_card.png" alt="image"></p>
 <p>究其原因，发现这是某些浏览器的渲染规则，涉及到 <code>stacking context</code> 的概念，transform 的元素会创建新的 DOM，层级会在普通元素的上面，除了 transform ,还有哪些情况会创建新 <code>stacking context</code>呢？</p>
@@ -1312,14 +1313,16 @@ $ git push origin --tags
     
       <category term="translate3d" scheme="http://aotu.io/tags/translate3d/"/>
     
+      <category term="zindex" scheme="http://aotu.io/tags/zindex/"/>
+    
   </entry>
   
   <entry>
-    <title><![CDATA[开始学习PostCSS]]></title>
+    <title><![CDATA[PostCSS快速入门使用]]></title>
     <link href="http://aotu.io/notes/2015/11/15/start-postcss/"/>
     <id>http://aotu.io/notes/2015/11/15/start-postcss/</id>
     <published>2015-11-15T09:34:25.000Z</published>
-    <updated>2015-11-24T11:13:40.000Z</updated>
+    <updated>2015-12-01T05:17:06.000Z</updated>
     <content type="html"><![CDATA[<h2 id="初识PostCSS">初识PostCSS</h2><p>如果你第一次听说<code>PostCSS</code>这个东西，那么请看下面摘自官方<code>Github</code>的介绍：</p>
 <blockquote>
 <p>PostCSS is a tool for transforming CSS with JS Plugins. These plugins can support variables and mixins, transpile future CSS syntax, inline images, and more</p>
