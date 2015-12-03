@@ -4,7 +4,7 @@
   <subtitle><![CDATA[凹凸实验室]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://aotu.io/"/>
-  <updated>2015-11-24T11:13:40.000Z</updated>
+  <updated>2015-12-03T01:41:43.000Z</updated>
   <id>http://aotu.io/</id>
   
   <author>
@@ -15,11 +15,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title><![CDATA[如何优(zhuang)雅(bi)地向别人介绍你的洗面奶]]></title>
+    <title><![CDATA[使用ThreeJS在浏览器中展示3D物件]]></title>
     <link href="http://aotu.io/notes/2015/11/24/3D-CleaningCream/"/>
     <id>http://aotu.io/notes/2015/11/24/3D-CleaningCream/</id>
     <published>2015-11-24T13:00:35.000Z</published>
-    <updated>2015-11-24T11:13:40.000Z</updated>
+    <updated>2015-12-03T01:41:43.000Z</updated>
     <content type="html"><![CDATA[<p>这是一篇介绍如何在浏览器中展示<del style="background-color: #333!important;color: #333 !important;">洗面奶</del>3D物件的文章。<br><a id="more"></a> </p>
 <h3 id="前言">前言</h3><p>这篇文章仅仅是向你介绍应对下面这种的场景的方法：如果有人突然跟你说，你的皮肤挺不错的耶，你用的什么洗面奶，我也想买一个，你会怎么回答呢？手头又没法拿出你的洗面奶给他看，光凭言语无法准确地形容出你的洗面奶到底长什么样。作为前端的程序猿，我会想，这种时候如果可以有一个链接让对方自己去看一下把玩一下，对方势必会对你的洗面奶<del style="background-color: #333!important;color: #333 !important;">高Bigger</del>有更深刻的认识。本文的目的，就是向屏幕对面的程序猿介绍这种高效<del style="background-color: #333!important;color: #333 !important;">搞笑</del>的方式。</p>
 <h3 id="走进3D的世界">走进3D的世界</h3><p>在页面里面放几个图片是完全无法满足让观看者自己看自己把玩的要求的。所以这里我们将会使用3D的形式来展现我们的洗面奶。老话说得好，同样是山，却有横看成岭侧成峰的不同。比起2D渲染，3D渲染多了一个维度，由于透视效果，物体遮挡、光照角度、光的反射折射等的存在，观看者在不同的角度观看会得到不同的结果。</p>
@@ -171,23 +171,24 @@
     <link href="http://aotu.io/notes/2015/11/23/css3-animation-to-movie-part_2/"/>
     <id>http://aotu.io/notes/2015/11/23/css3-animation-to-movie-part_2/</id>
     <published>2015-11-22T17:27:00.000Z</published>
-    <updated>2015-12-01T15:34:34.000Z</updated>
+    <updated>2015-12-03T01:29:59.000Z</updated>
     <content type="html"><![CDATA[<h1 id="以电影之眼看CSS3动画（二）">以电影之眼看CSS3动画（二）</h1><hr>
 <pre><code>注：此文非干货聚集地，来找干货的对不住了。
+注注：又多又大的图预警！！！
 </code></pre><p>上回说到CSS3动画与传统动画之间千丝万缕的联系，现在就让我们来探讨一下用CSS3动画做一部动画电影都需要些什么。</p>
 <p>一、</p>
 <p><strong>首先你需要一个故事。</strong></p>
 <p>即使只是一堆雪花往下掉，也是包含故事的——为什么下雪？是冬天来了？那是冬天的第一场雪吗？第一场雪有什么特点呢？好吧作为一个从没见过雪的南方人我承认我给自己挖了个坑，不过就是类似这种思路，让我们拥有了一个故事，所以，即使只有一秒钟的动画也是有故事的。Use your imagination.</p>
 <p>小tip：在做影视题材的专题页时，我会首先根据相关影视的预告片确定入场动画的风格与基调，观看预告片不仅能够了解影片的风格，同时还能学习其字幕出现、消失以及转场的方式，获得一种节奏感，也就是上面所说的时间掌控。在看电影正片时也可留意影片开头与结尾字幕出现的形式，尤其是科幻片，电影字幕的设计与电影风格相辅相成，常常能让你脑洞大开——原来还能这么玩。</p>
-<p><img src="/img/post/2015-11-22-css3-animation-to-movie/2-1_preview_of_overheard_3_2.gif" alt="preview_of_overheard_3"></p>
+<p><img src="/img/post/2015-11-22-css3-animation-to-movie/2-1_preview_of_overheard_3.gif" alt="preview_of_overheard_3"></p>
 <ul>
 <li><a href="http://movie.douban.com/trailer/156598/#content" target="_blank" rel="external">[窃听风云3]预告片</a>中字幕出现的方式表现出信号干扰的效果，由此可以将影片相关专题作出这样的开场动画——</li>
 </ul>
-<p><img src="/img/post/2015-11-22-css3-animation-to-movie/2-2_animation_design_of_overheard_3_broadcast_2.gif" alt="animation_design_of_overheard_3_broadcast"></p>
+<p><img src="/img/post/2015-11-22-css3-animation-to-movie/2-2_animation_design_of_overheard_3_broadcast.gif" alt="animation_design_of_overheard_3_broadcast"></p>
 <ul>
 <li>视觉设计：吴丹枫</li>
 </ul>
-<p><img src="/img/post/2015-11-22-css3-animation-to-movie/2-3_frames_of_animation.png" alt="frames_of_animation"></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="at_rule">@<span class="keyword">keyframes</span> peoInner</span>&#123;</span><br><span class="line">	0%, 12<span class="class">.5</span>%, 16<span class="class">.5</span>%, 20<span class="class">.5</span>%<span class="rules">&#123;<span class="rule"><span class="attribute">background</span>:<span class="value">none</span></span>;&#125;</span></span><br><span class="line">	10%, 12%<span class="rules">&#123;<span class="rule"><span class="attribute">background</span>:<span class="value"><span class="function">url</span>(../img_bg/casts_adv_green_red.jpg) no-repeat <span class="number">0</span> <span class="number">0</span></span></span>;&#125;</span></span><br><span class="line">	14%, 16%<span class="rules">&#123;<span class="rule"><span class="attribute">background</span>:<span class="value"><span class="function">url</span>(../img_bg/casts_adv_green_red.jpg) no-repeat <span class="number">0</span> -<span class="number">725px</span></span></span>;&#125;</span></span><br><span class="line">	18%, 20%<span class="rules">&#123;<span class="rule"><span class="attribute">background</span>:<span class="value"><span class="function">url</span>(../img_bg/casts_adv_green_red.jpg) no-repeat <span class="number">0</span> -<span class="number">725px</span></span></span>;&#125;</span></span><br><span class="line">	13%, 17%, 21%, 100%<span class="rules">&#123;<span class="rule"><span class="attribute">background</span>:<span class="value"><span class="function">url</span>(../img_bg/cast_adv_01.jpg) no-repeat top center</span></span>;&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ul>
 <li>简单的几个不同色调的图片进行替换就能做出类似效果。（<a href="http://labs.qiang.it/labs/EC_demo/Doing_Movie_by_CSS3.html" target="_blank" rel="external">demo地址</a>）</li>
 </ul>
@@ -200,17 +201,17 @@
 <ul>
 <li>（视频 <a href="http://player.ku6.com/refer/TH-adgFO0MjSKh3i/v.swf" target="_blank" rel="external">http://player.ku6.com/refer/TH-adgFO0MjSKh3i/v.swf</a> ）</li>
 </ul>
-<p><img src="/img/post/2015-11-22-css3-animation-to-movie/2-4_sidelights_of_snow_white_2.gif" alt="sidelights_of_snow_white"></p>
+<p><img src="/img/post/2015-11-22-css3-animation-to-movie/2-4_sidelights_of_snow_white.gif" alt="sidelights_of_snow_white"></p>
 <ul>
 <li>视频：[白雪公主与七个小矮人]（1974）幕后花絮</li>
 </ul>
 <p>视频中有一个细节，迪士尼爷爷让动画师注意那位大叔在跳踢踏舞时重力对裤腿的作用（19分15秒）。是的，迪士尼爷爷强调的就是动画与物理学的关系。其实即使是网页中的动画也能用到牛顿运动定律，将网页元素看作一个有重量、有结构、有柔韧性的物体进行动画设计，会得到意想不到的效果。事实上已经有人这么做了——</p>
-<p><img src="/img/post/2015-11-22-css3-animation-to-movie/2-5_dribbble_form_animation_2.gif" alt="dribbble_form_animation"></p>
+<p><img src="/img/post/2015-11-22-css3-animation-to-movie/2-5_dribbble_form_animation.gif" alt="dribbble_form_animation"></p>
 <ul>
 <li>dribbble’s stripe checkout（图片来源：<a href="http://markgeyer.com/pres/the-art-of-ui-animations/#/2/9" target="_blank" rel="external">The Art of Animation</a>）</li>
 </ul>
 <p>Adds a bit of realism to an otherwise static interface. ——<a href="http://markgeyer.com/pres/the-art-of-ui-animations/#/2/5" target="_blank" rel="external">The 12 basic principles of animation - The Art of Animation</a></p>
-<p><img src="/img/post/2015-11-22-css3-animation-to-movie/2-6_bouncejs_example_2.gif" alt="bouncejs_example"></p>
+<p><img src="/img/post/2015-11-22-css3-animation-to-movie/2-6_bouncejs_example.gif" alt="bouncejs_example"></p>
 <ul>
 <li>图片来源：<a href="https://medium.com/tictail-makers/giving-animations-life-8b20165224c5" target="_blank" rel="external">Giving Animations Life</a></li>
 </ul>
@@ -225,7 +226,7 @@
 <p>别忘了进行<strong>性能测试</strong>。</p>
 <p>这是一步有可能推翻前面两步甚至三步的一个步骤。但是即便发生了这样的事，也不要气馁，这并不意味着之前做的前功尽弃，反而是个宝贵的财富——对于性能的感受又多了一次体验，而其中的一些动画心得或许下次也能用上。</p>
 <p>说了这么多，一切都显得辣么抽象，下面就上栗子。</p>
-<p><img src="/img/post/2015-11-22-css3-animation-to-movie/2-7_animation_of_an_eye_2.gif" alt="animation_of_an_eye"></p>
+<p><img src="/img/post/2015-11-22-css3-animation-to-movie/2-7_animation_of_an_eye.gif" alt="animation_of_an_eye"></p>
 <ul>
 <li>动画来源：<a href="http://tympanus.net/Development/PseudoElementsAnimationsTransitions/index4.html" target="_blank" rel="external">Pseudo-Elements Animations and Transitions</a></li>
 </ul>
@@ -267,7 +268,8 @@
     <summary type="html">
     <![CDATA[<h1 id="以电影之眼看CSS3动画（二）">以电影之眼看CSS3动画（二）</h1><hr>
 <pre><code>注：此文非干货聚集地，来找干货的对不住了。
-</code></pre><p>上回说到CSS3动画与传统动画之间千丝万缕的联系，现在就让我们来探讨一下用CSS3]]>
+注注：又多又大的图预警！！！
+</code></pre><p>上回说到CSS3动画与传统动画之间千丝万缕的联系，现]]>
     </summary>
     
       <category term="Animation" scheme="http://aotu.io/tags/Animation/"/>
@@ -281,16 +283,17 @@
     <link href="http://aotu.io/notes/2015/11/23/css3-animation-to-movie-part_1/"/>
     <id>http://aotu.io/notes/2015/11/23/css3-animation-to-movie-part_1/</id>
     <published>2015-11-22T17:27:00.000Z</published>
-    <updated>2015-12-01T15:34:34.000Z</updated>
+    <updated>2015-12-03T01:29:59.000Z</updated>
     <content type="html"><![CDATA[<h1 id="以电影之眼看CSS3动画（一）">以电影之眼看CSS3动画（一）</h1><hr>
-<pre><code>注：此文非干货聚集地，来找干货的对不住了。
+<pre><code>注：此文非干货聚集地，来找干货的对不住了。    
+注注：又多又大的图预警！！！
 </code></pre><p><a href="http://isux.tencent.com/css3/index.html" target="_blank" rel="external">CSS3动画</a>的变形基础（transform）包含4种变形方式（translate、rotate、scale、skew），同时还可设置2D、3D、变形原点（transform-origin）、透视（perspective）、透视原点（perspective-origin）等等特性；动画时间频率包含9种基本模式（ease、linear、ease-in、ease-out、ease-in-out、step-start、step-end、steps），甚至还可以使用cubic-bezier写出任何你想要的模式；再加上动画持续时间（animation-duration）等设定，各种排列组合，CSS3动画简直拥有了整个世界！</p>
 <p><img src="/img/post/2015-11-22-css3-animation-to-movie/1-1_trandition_animation.png" alt="trandition_animation"></p>
 <ul>
 <li>图片来源《动画的时间掌握》</li>
 </ul>
 <p>根据<a href="http://zh.wikipedia.org/wiki/%E5%8A%A8%E7%94%BB" target="_blank" rel="external">维基</a>的释义，动画是指由许多帧静止的画面，以一定的速度（如每秒16张）连续播放时，肉眼因视觉残象产生错觉，而误以为画面活动的作品（gif图片正是运用这种原理）。因此最初的动画是通过几张快速翻动的连续画面制作而成，而后经历了电影摄影技术的出现、电脑科技的进步，逐渐转向数字化。</p>
-<p><img src="/img/post/2015-11-22-css3-animation-to-movie/1-2_bouncing_ball_2.gif" alt="bouncing_ball"><br><img src="/img/post/2015-11-22-css3-animation-to-movie/1-3_boucing_ball_frames.png" alt="boucing_ball_frames"></p>
+<p><img src="/img/post/2015-11-22-css3-animation-to-movie/1-2_bouncing_ball.gif" alt="bouncing_ball"><br><img src="/img/post/2015-11-22-css3-animation-to-movie/1-3_boucing_ball_frames.png" alt="boucing_ball_frames"></p>
 <ul>
 <li>将gif拖入PS之后打开时间轴窗口即可看到每一帧的画面</li>
 </ul>
@@ -300,7 +303,7 @@
 <p>A 需要很大的力才能使一个炮弹移动。一旦它移动了，同样需要很大的力才能阻挡它前进。B 一只汽球只需要很小的力去移动它，但空气阻力使它很快停止动作。这两个例子都画了动作分格线，可以看出在银幕上表现物体的轻重，取决于对它们动作的时间掌握。（图片来源：《动画的时间掌握》）</p>
 </blockquote>
 <p>在<a href="http://cghappening.blogspot.com/2011/02/blog-post_23.html" target="_blank" rel="external">《動畫製作流程介紹》</a>提供的视频中可以看到关键帧在动画制作中所起的地基般的作用。</p>
-<p><img src="/img/post/2015-11-22-css3-animation-to-movie/1-5_story_board_of_Monster_Inc_2.gif" alt="story_board_of_Monster_Inc"></p>
+<p><img src="/img/post/2015-11-22-css3-animation-to-movie/1-5_story_board_of_Monster_Inc.gif" alt="story_board_of_Monster_Inc"></p>
 <ul>
 <li>画面上方的手绘图即为[怪物公司]的关键帧</li>
 </ul>
@@ -310,7 +313,8 @@
 <li>摄制表（图片来源：《动画的时间掌握》）</li>
 </ul>
 <p>在CSS3中，@keyframes正是动画的关键帧容器。@keyframes中包含的包括transform在内的元素形态设定构成了关键帧的画面。@keyframes中的百分比即为时间轴的体现。中间帧则由浏览器自动完成（就像flash中的补全动画）。</p>
-<p><img src="/img/post/2015-11-22-css3-animation-to-movie/1-7_css3_animation.png" alt="css3_animation"></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">.people</span><span class="rules">&#123;<span class="rule"><span class="attribute">animation</span>:<span class="value">people linear <span class="number">1.5s</span></span></span>;&#125;</span></span><br><span class="line"><span class="at_rule">@<span class="keyword">keyframes</span> people</span>&#123;</span><br><span class="line">	0%, 95%<span class="rules">&#123;<span class="rule"><span class="attribute">opacity</span>:<span class="value"><span class="number">0</span></span></span>;&#125;</span></span><br><span class="line">	100%<span class="rules">&#123;<span class="rule"><span class="attribute">opacity</span>:<span class="value"><span class="number">1</span></span></span>;&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="/img/post/2015-11-22-css3-animation-to-movie/1-7_css3_animation_2.png" alt="css3_animation"></p>
 <ul>
 <li>一个简单的动画关键帧示例</li>
 </ul>
@@ -321,8 +325,9 @@
 ]]></content>
     <summary type="html">
     <![CDATA[<h1 id="以电影之眼看CSS3动画（一）">以电影之眼看CSS3动画（一）</h1><hr>
-<pre><code>注：此文非干货聚集地，来找干货的对不住了。
-</code></pre><p><a href="http://isux.tencent.com/css3/ind]]>
+<pre><code>注：此文非干货聚集地，来找干货的对不住了。    
+注注：又多又大的图预警！！！
+</code></pre><p><a href="http://isux.t]]>
     </summary>
     
       <category term="Animation" scheme="http://aotu.io/tags/Animation/"/>
@@ -970,7 +975,7 @@ $ git push origin --tags
     <link href="http://aotu.io/notes/2015/11/18/flash-canvas/"/>
     <id>http://aotu.io/notes/2015/11/18/flash-canvas/</id>
     <published>2015-11-17T18:44:25.000Z</published>
-    <updated>2015-12-01T05:38:20.000Z</updated>
+    <updated>2015-12-03T01:29:59.000Z</updated>
     <content type="html"><![CDATA[<p>flash可以导出canvas动画，大大缩短制作动画所需要的时间。它是一个可视化IDE，可以让我们写少很多代码。做出来的动画，可以更加精确。同时，可以通用使用帧脚本中的 Javascript，为资源添加交互性。</p>
 <a id="more"></a>
 <h2 id="新建HTML5_Canvas项目">新建HTML5 Canvas项目</h2><p class="user_img"><img src="/img/post/youing/1.png"></p>
@@ -994,15 +999,15 @@ $ git push origin --tags
 <p class="user_img"><img src="/img/post/youing/5.png"></p>
 <p class="user_img"><img src="/img/post/youing/6.png"></p>
 <h2 id="动作播放控制">动作播放控制</h2><p>如果我们希望动画可以连续从头再播放，可以在动画的最后一帧插入一个空白关键帧，打开动作面板，然后写上</p>
-<pre><code>this.<span class="function"><span class="title">gotoAndPlay</span><span class="params">(<span class="number">0</span>)</span></span>
-</code></pre><p class="user_img"><img src="/img/post/youing/7.png"></p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">this.<span class="function"><span class="title">gotoAndPlay</span><span class="params">(<span class="number">0</span>)</span></span></span><br></pre></td></tr></table></figure>
+<p class="user_img"><img src="/img/post/youing/7.png"></p>
 <p>即可回到第一帧重新播放，如果希望停止动画，则</p>
-<pre><code><span class="keyword">this</span>.stop();
-</code></pre><p>如果希望跳到某帧去播放</p>
-<pre><code>this.<span class="function"><span class="title">gotoAndPlay</span><span class="params">(n)</span></span>
-</code></pre><p>如果希望跳到某帧并停止</p>
-<pre><code>this.<span class="function"><span class="title">gotoAndStop</span><span class="params">(n)</span></span>
-</code></pre><h2 id="发布">发布</h2><p>文件 &gt; 发布设置</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.stop();</span><br></pre></td></tr></table></figure>
+<p>如果希望跳到某帧去播放</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">this.<span class="function"><span class="title">gotoAndPlay</span><span class="params">(n)</span></span></span><br></pre></td></tr></table></figure>
+<p>如果希望跳到某帧并停止</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">this.<span class="function"><span class="title">gotoAndStop</span><span class="params">(n)</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="发布">发布</h2><p>文件 &gt; 发布设置</p>
 <h3 id="文件输出">文件输出</h3><ul>
 <li>循环时间轴(<em>表示是否循环整个动画</em>)</li>
 <li>覆盖HTML(<em>第一次发布时可以选上，如果对html有修改，记得把这个选项去掉,否则会对文件进行覆盖操作</em>)</li>
@@ -1012,15 +1017,15 @@ $ git push origin --tags
 <li>javascript命名空间(<em>基本上不需要修改</em>)，这几个属于全局变量，可以在发布后的js文件中再修改。</li>
 </ul>
 <p class="user_img"><img src="/img/post/youing/8.png"></p>
-<h3 id="生成html">生成html</h3><p>最终会生成一个html文件和一个js文件</p>
+<h2 id="生成html">生成html</h2><p>最终会生成一个html文件和一个js文件</p>
 <h3 id="生成的html文件">生成的html文件</h3><ul>
 <li>框架自带的preloadjs,可以轻松管理资源预加载，它提供了相关api可以进行loading等操作。</li>
 </ul>
-<p class="user_img"><img src="/img/post/youing/9.png"></p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="doctype">&lt;!DOCTYPE html&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">html</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">head</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">meta</span> <span class="attribute">charset</span>=<span class="value">"UTF-8"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">title</span>&gt;</span>people<span class="tag">&lt;/<span class="title">title</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"http://code.createjs.com/easeljs-0.8.1.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"http://code.createjs.com/tweenjs-0.6.1.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"http://code.createjs.com/movieclip-0.8.1.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"http://code.createjs.com/preloadjs-0.6.1.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">script</span> <span class="attribute">src</span>=<span class="value">"people.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">script</span>&gt;</span><span class="javascript"></span><br><span class="line"><span class="keyword">var</span> canvas, stage, exportRoot;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">init</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	canvas = <span class="built_in">document</span>.getElementById(<span class="string">"canvas"</span>);</span><br><span class="line">	images = images||&#123;&#125;;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">var</span> loader = <span class="keyword">new</span> createjs.LoadQueue(<span class="literal">false</span>);</span><br><span class="line">	loader.addEventListener(<span class="string">"fileload"</span>, handleFileLoad);</span><br><span class="line">	loader.addEventListener(<span class="string">"complete"</span>, handleComplete);</span><br><span class="line">	loader.loadManifest(lib.properties.manifest);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">handleFileLoad</span>(<span class="params">evt</span>) </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (evt.item.type == <span class="string">"image"</span>) &#123; images[evt.item.id] = evt.result; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">handleComplete</span>(<span class="params">evt</span>) </span>&#123;</span><br><span class="line">	exportRoot = <span class="keyword">new</span> lib.people();</span><br><span class="line"></span><br><span class="line">	stage = <span class="keyword">new</span> createjs.Stage(canvas);</span><br><span class="line">	stage.addChild(exportRoot);</span><br><span class="line">	stage.update();</span><br><span class="line"></span><br><span class="line">	createjs.Ticker.setFPS(lib.properties.fps);</span><br><span class="line">	createjs.Ticker.addEventListener(<span class="string">"tick"</span>, stage);</span><br><span class="line">&#125;</span><br><span class="line"></span><span class="tag">&lt;/<span class="title">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">head</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="title">body</span> <span class="attribute">onload</span>=<span class="value">"init();"</span> <span class="attribute">style</span>=<span class="value">"background-color:#D4D4D4"</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="title">canvas</span> <span class="attribute">id</span>=<span class="value">"canvas"</span> <span class="attribute">width</span>=<span class="value">"600"</span> <span class="attribute">height</span>=<span class="value">"620"</span> <span class="attribute">style</span>=<span class="value">"background-color:#FFFFFF"</span>&gt;</span><span class="tag">&lt;/<span class="title">canvas</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <h3 id="生成的js文件">生成的js文件</h3><ul>
 <li>生成的动画配置及脚本都在这个js文件里面，如果需要，可以手动修改相关数据。</li>
 </ul>
-<p class="user_img"><img src="/img/post/youing/10.png"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line">(<span class="function"><span class="keyword">function</span> (<span class="params">lib, img, cjs, ss</span>) </span>&#123;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> p; <span class="comment">// shortcut to reference prototypes</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// library properties:</span></span><br><span class="line">lib.properties = &#123;</span><br><span class="line">	width: <span class="number">600</span>,</span><br><span class="line">	height: <span class="number">620</span>,</span><br><span class="line">	fps: <span class="number">36</span>,</span><br><span class="line">	color: <span class="string">"#FFFFFF"</span>,</span><br><span class="line">	manifest: [</span><br><span class="line">		&#123;src:<span class="string">"images/bigband.png"</span>, id:<span class="string">"bigband"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/Bitmap1.png"</span>, id:<span class="string">"Bitmap1"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/body.png"</span>, id:<span class="string">"body"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/eye1.png"</span>, id:<span class="string">"eye1"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/eye2.png"</span>, id:<span class="string">"eye2"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/face1.png"</span>, id:<span class="string">"face1"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/face2.png"</span>, id:<span class="string">"face2"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/face3.png"</span>, id:<span class="string">"face3"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/hair.png"</span>, id:<span class="string">"hair"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/hand2.png"</span>, id:<span class="string">"hand2"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/hand3.png"</span>, id:<span class="string">"hand3"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/hand4.png"</span>, id:<span class="string">"hand4"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/index30.png"</span>, id:<span class="string">"index30"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/index302.png"</span>, id:<span class="string">"index302"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/index40.png"</span>, id:<span class="string">"index40"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/index5.png"</span>, id:<span class="string">"index5"</span>&#125;,</span><br><span class="line">		&#123;src:<span class="string">"images/shadow.png"</span>, id:<span class="string">"shadow"</span>&#125;</span><br><span class="line">	]</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// symbols:</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(lib.bigband = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.initialize(img.bigband);</span><br><span class="line">&#125;).prototype = p = <span class="keyword">new</span> cjs.Bitmap();</span><br><span class="line">p.nominalBounds = <span class="keyword">new</span> cjs.Rectangle(<span class="number">0</span>,<span class="number">0</span>,<span class="number">295</span>,<span class="number">538</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(lib.Bitmap1 = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.initialize(img.Bitmap1);</span><br><span class="line">&#125;).prototype = p = <span class="keyword">new</span> cjs.Bitmap();</span><br><span class="line">p.nominalBounds = <span class="keyword">new</span> cjs.Rectangle(<span class="number">0</span>,<span class="number">0</span>,<span class="number">543</span>,<span class="number">577</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(lib.body = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.initialize(img.body);</span><br><span class="line">&#125;).prototype = p = <span class="keyword">new</span> cjs.Bitmap();</span><br><span class="line">p.nominalBounds = <span class="keyword">new</span> cjs.Rectangle(<span class="number">0</span>,<span class="number">0</span>,<span class="number">521</span>,<span class="number">242</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(lib.eye1 = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.initialize(img.eye1);</span><br><span class="line">&#125;).prototype = p = <span class="keyword">new</span> cjs.Bitmap();</span><br><span class="line">p.nominalBounds = <span class="keyword">new</span> cjs.Rectangle(<span class="number">0</span>,<span class="number">0</span>,<span class="number">73</span>,<span class="number">58</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(lib.eye2 = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.initialize(img.eye2);</span><br><span class="line">&#125;).prototype = p = <span class="keyword">new</span> cjs.Bitmap();</span><br><span class="line">p.nominalBounds = <span class="keyword">new</span> cjs.Rectangle(<span class="number">0</span>,<span class="number">0</span>,<span class="number">72</span>,<span class="number">35</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(lib.face1 = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.initialize(img.face1);</span><br><span class="line">&#125;).prototype = p = <span class="keyword">new</span> cjs.Bitmap();</span><br><span class="line">p.nominalBounds = <span class="keyword">new</span> cjs.Rectangle(<span class="number">0</span>,<span class="number">0</span>,<span class="number">297</span>,<span class="number">368</span>);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="comment">// stage content:</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">(lib.people = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">	<span class="keyword">this</span>.initialize();</span><br><span class="line"></span><br><span class="line">	<span class="comment">// people</span></span><br><span class="line">	<span class="keyword">this</span>.instance = <span class="keyword">new</span> lib.peoplemc();</span><br><span class="line">	<span class="keyword">this</span>.instance.setTransform(<span class="number">295</span>,<span class="number">312.5</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// qpmask (mask)</span></span><br><span class="line">	<span class="keyword">var</span> mask = <span class="keyword">new</span> cjs.Shape();</span><br><span class="line">	mask._off = <span class="literal">true</span>;</span><br><span class="line">	mask.graphics.p(<span class="string">"EgpUgqAMBU1AAAMAAABaIMhU1AAAg"</span>);</span><br><span class="line">	mask.setTransform(<span class="number">278.5</span>,<span class="number">308.1</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// qp</span></span><br><span class="line">	<span class="keyword">this</span>.instance_1 = <span class="keyword">new</span> lib.qpmc();</span><br><span class="line">	<span class="keyword">this</span>.instance_1.setTransform(<span class="number">291.5</span>,<span class="number">263.5</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">this</span>.instance_1.mask = mask;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">this</span>.addChild(<span class="keyword">this</span>.instance_1,<span class="keyword">this</span>.instance);</span><br><span class="line">&#125;).prototype = p = <span class="keyword">new</span> cjs.Container();</span><br><span class="line">p.nominalBounds = <span class="keyword">new</span> cjs.Rectangle(<span class="number">263</span>,<span class="number">31.5</span>,<span class="number">617</span>,<span class="number">905.5</span>);</span><br><span class="line"></span><br><span class="line">&#125;)(lib = lib||&#123;&#125;, images = images||&#123;&#125;, createjs = createjs||&#123;&#125;, ss = ss||&#123;&#125;);</span><br><span class="line"><span class="keyword">var</span> lib, images, createjs, ss;</span><br></pre></td></tr></table></figure>
 <h2 id="附上最终效果">附上最终效果</h2><p><a href="http://b.gengshu.net/doc/flash/people.html" target="_blank" rel="external">点我看效果</a></p>
 ]]></content>
     <summary type="html">
