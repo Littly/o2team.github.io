@@ -2,8 +2,18 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://aotu.io/notes/2015/12/18/etymology-of-foobar/</loc>
-    <lastmod>2015-12-24T09:51:19.000Z</lastmod>
+    <loc>http://aotu.io/notes/2015/11/24/3D-CleaningCream/</loc>
+    <lastmod>2015-12-24T10:37:20.000Z</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://aotu.io/notes/2015/11/24/project-summary/</loc>
+    <lastmod>2015-12-24T10:37:12.000Z</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://aotu.io/notes/2015/12/23/new-safari-9/</loc>
+    <lastmod>2015-12-24T10:35:22.000Z</lastmod>
   </url>
   
   <url>
@@ -12,17 +22,17 @@
   </url>
   
   <url>
-    <loc>http://aotu.io/notes/2015/12/23/new-safari-9/</loc>
+    <loc>http://aotu.io/notes/2015/12/18/etymology-of-foobar/</loc>
     <lastmod>2015-12-24T09:51:19.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://aotu.io/notes/2015/11/24/3D-CleaningCream/</loc>
+    <loc>http://aotu.io/about/index.html</loc>
     <lastmod>2015-12-10T02:02:53.000Z</lastmod>
   </url>
   
   <url>
-    <loc>http://aotu.io/notes/2015/11/24/project-summary/</loc>
+    <loc>http://aotu.io/notes/2015/10/08/aotu-blog-v1/</loc>
     <lastmod>2015-12-10T02:02:53.000Z</lastmod>
   </url>
   
@@ -57,7 +67,7 @@
   </url>
   
   <url>
-    <loc>http://aotu.io/notes/2015/11/08/css-stack-order/</loc>
+    <loc>http://aotu.io/notes/2015/10/13/start-postcss/</loc>
     <lastmod>2015-12-10T02:02:53.000Z</lastmod>
   </url>
   
@@ -67,7 +77,7 @@
   </url>
   
   <url>
-    <loc>http://aotu.io/about/index.html</loc>
+    <loc>http://aotu.io/notes/2015/11/02/flash-canvas/</loc>
     <lastmod>2015-12-10T02:02:53.000Z</lastmod>
   </url>
   
@@ -87,17 +97,7 @@
   </url>
   
   <url>
-    <loc>http://aotu.io/notes/2015/10/13/start-postcss/</loc>
-    <lastmod>2015-12-10T02:02:53.000Z</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://aotu.io/notes/2015/10/08/aotu-blog-v1/</loc>
-    <lastmod>2015-12-10T02:02:53.000Z</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://aotu.io/notes/2015/11/02/flash-canvas/</loc>
+    <loc>http://aotu.io/notes/2015/11/08/css-stack-order/</loc>
     <lastmod>2015-12-10T02:02:53.000Z</lastmod>
   </url>
   
