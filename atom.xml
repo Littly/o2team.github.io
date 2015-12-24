@@ -4,7 +4,7 @@
   <subtitle><![CDATA[凹凸实验室]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://aotu.io/"/>
-  <updated>2015-12-09T11:01:48.000Z</updated>
+  <updated>2015-12-24T09:51:19.000Z</updated>
   <id>http://aotu.io/</id>
   
   <author>
@@ -13,6 +13,599 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title><![CDATA[【译】使用Node.js创建命令行脚本工具]]></title>
+    <link href="http://aotu.io/notes/2015/12/23/building-command-line-tools-with-node-js/"/>
+    <id>http://aotu.io/notes/2015/12/23/building-command-line-tools-with-node-js/</id>
+    <published>2015-12-23T13:19:07.000Z</published>
+    <updated>2015-12-24T09:51:19.000Z</updated>
+    <content type="html"><![CDATA[<blockquote>
+<p>本文译自 <a href="https://developer.atlassian.com/blog/2015/11/scripting-with-node/" target="_blank" rel="external">Building command line tools with Node.js</a>，介绍了如何通过Node.js来创建命令行脚本工具，介绍了很多实用的<code>npm</code>包等。翻译水平有限，敬请指正~</p>
+</blockquote>
+<a id="more"></a>
+<p>在我的职业生涯中已经写过了上百个 <code>Bash</code> 脚本，但我的 <code>Bash</code> 依然写得很糟糕，每一次我都不得不去查一些简单逻辑结构的语法。如果我想通过 <code>curl</code> 或者 <code>sed</code> 来做一些事情，我也必须去查找 <code>man</code> 文档。</p>
+<p>然后，有一天，我看到六个字母的语言[译者注：这里指NodeJS] — 一门在过去十年里我几乎 <em>每一天</em> 都在使用的语言，这才让我幡然醒悟。结果是你可以使用 <code>JavaScript</code> 来写脚本！</p>
+<p>在这篇教程中，我将会在使用 <code>Node.js</code> 和 <code>npm</code> 创建一个脚本或者命令行工具方面给你一些我的想法。特别地我们将会包括以下内容：</p>
+<ul>
+<li>使用 <code>npm</code> 封装一个新的 <code>shell</code> 命令</li>
+<li>解析命令行参数</li>
+<li>从输入流中读取文本和密码</li>
+<li>发送 snippet</li>
+<li>输出错误与代码</li>
+<li>终端输出彩色化</li>
+<li>渲染 <code>ACSII</code> 进度条</li>
+</ul>
+<p>我热衷于已经可以工作的例子，所以为了解释这些概念我们将会创建一个新的 <code>shell</code> 命令，它的名字为 <code>snippet</code> ，可以在我们本地磁盘的文件创建一个 <a href="https://confluence.atlassian.com/bitbucket/snippets-719095082.html" target="_blank" rel="external">Bitbucket Snippet</a>。</p>
+<p>这是我们的最终目标成果：</p>
+<p class="user_img"><img title="snippet用法" class="test_img" src="/img/post/cnt1992/snippet-usage.gif" alt="snippet用法"></p>
+<h2 id="封装_shell_命令">封装 shell 命令</h2><p><code>npm</code> 不单单用来管理你的应用和网页的依赖，你还能用它来封装和分发新的 <code>shell</code> 命令。</p>
+<p>第一步就是通过 <code>npm init</code> [译者注：可以通过 <code>npm init -f</code>直接快速生成一个<code>package.json</code>]来创建一个新的 <code>npm</code> 项目：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$ npm init</span><br><span class="line">name: bitbucket-snippet</span><br><span class="line">version: <span class="number">0.0</span>.<span class="number">1</span></span><br><span class="line">description: A <span class="built_in">command</span>-line tool <span class="keyword">for</span> creating Bitbucket snippets.</span><br><span class="line">entry point: index.js</span><br><span class="line">license: Apache-<span class="number">2.0</span></span><br></pre></td></tr></table></figure>
+<p>这会在我们的项目中创建一个新的 <code>package.json</code> 文件，那时我们将需要创建一个 <code>JS</code> 文件包含我们的脚本。让我们根据Node.js的传统命名为 <code>index.js</code>。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env node</span><br><span class="line">console.log('Hello, world!');</span><br></pre></td></tr></table></figure>
+<p>注意我们必须加一些 <code>东西</code> 来告诉我们的 <code>shell</code> 如何处理我们的脚本。</p>
+<p>接下来我们需要在我们 <code>package.json</code> 里面的最顶级增加 <code>bin</code> 部分。设置的属性（在我们的例子中是 <code>snippet</code>）将会变成用户在他们的终端处理脚本使用的命令，属性值就是相对于 <code>package.json</code> 的脚本位置。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">  "author": "Tim Pettersen",</span><br><span class="line">  "license": "Apache-2.0",</span><br><span class="line">  "bin": &#123;</span><br><span class="line">    "snippet": "./index.js"</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>现在我们已经有一个可以工作的 <code>shell</code> 命令了！让我们安装它并且测试结果。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -g</span><br><span class="line">$ snippet</span><br><span class="line">Hello, world!</span><br></pre></td></tr></table></figure>
+<p>真整洁！ <code>npm install -g</code> 实际上是将我们脚本链接到 <code>path</code> 变量的位置，所以我们能够在任何地方使用它。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">which</span> snippet</span><br><span class="line">/usr/<span class="built_in">local</span>/bin/snippet</span><br><span class="line">$ readlink /usr/<span class="built_in">local</span>/bin/snippet</span><br><span class="line">../lib/node_modules/bitbucket-snippet/index.js</span><br></pre></td></tr></table></figure>
+<p>在开发环境中我们实际上使用 <code>npm link</code> 便利地将我们的 <code>index.js</code> 软链接到 <code>path</code> 变量的位置。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ npm link</span><br><span class="line">/usr/<span class="built_in">local</span>/bin/snippet -&gt; /usr/<span class="built_in">local</span>/lib/node_modules/bitbucket-snippet/index.js</span><br><span class="line">/usr/<span class="built_in">local</span>/lib/node_modules/bitbucket-snippet -&gt; /Users/kannonboy/src/bitbucket-snippet</span><br></pre></td></tr></table></figure>
+<p>当我们开发完成的时候，我们可以通过 <code>npm publish</code> 将我们的脚本发布到公共 <code>npm</code> 仓库，然后任何人都可以下载安装到他们的机器上：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -g bitbucket-snippet</span><br></pre></td></tr></table></figure>
+<p>但是让我们先让我们的脚本能够工作先！</p>
+<h2 id="解析命令行参数">解析命令行参数</h2><p>我们的脚本现在需要一些用户的输入：他们的Bitbucket名字，他们的密码，还有作为 <code>snippet</code>上传的文件位置。典型的方法就是通过命令的参数传输这些值。</p>
+<p>你可以通过 <code>process.argv</code> 拿到序列化的参数，但有很多 <code>npm</code> 包在解析参数还有选项方面提供了很好的抽象给你。我最喜欢的就是 <a href="https://www.npmjs.com/package/commander" target="_blank" rel="external">commander</a>，来自 <code>Ruby gem</code>同一个名字的灵感。</p>
+<p>一个简单的命令安装它：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install --save commander</span><br></pre></td></tr></table></figure>
+<p>上面命令将会把最新版的 <code>commander</code> 加入 <code>package.json</code>。我们这时可以通过简单声明式的方式定义我们的选项：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/env node</span><br><span class="line">- console.log('Hello, world!');</span><br><span class="line">+ var program = require('commander');</span><br><span class="line">+</span><br><span class="line">+ program</span><br><span class="line">+  .arguments('&lt;file&gt;')</span><br><span class="line">+  .option('-u, --username &lt;username&gt;', 'The user to authenticate as')</span><br><span class="line">+  .option('-p, --password &lt;password&gt;', 'The user\'s password')</span><br><span class="line">+  .action(function(file) &#123;</span><br><span class="line">+    console.log('user: %s pass: %s file: %s',</span><br><span class="line">+        program.username, program.password, file);</span><br><span class="line">+  &#125;)</span><br><span class="line">+  .parse(process.argv);</span><br></pre></td></tr></table></figure>
+<p>上面代码可读性很强。事实上，这是一个保守的说法。相对于那些我们需要通过 <code>switch</code> 来控制的像 <code>Bash</code>，这是一个艺术品。至少，我写的 <code>Bash</code> 是这样子的。</p>
+<p>让我们快速测试：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ snippet -u kannonboy -p correcthorsebatterystaple file</span><br><span class="line">user: kannonboy pass: correcthorsebatterystaple file: file</span><br></pre></td></tr></table></figure>
+<p>很棒！<code>commander</code> 还提供一些简单的帮助输出给我们，基于我们上面提供的配置。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ snippet --help</span><br><span class="line"></span><br><span class="line">  Usage: snippet [options] &lt;file&gt;</span><br><span class="line"></span><br><span class="line">  Options:</span><br><span class="line"></span><br><span class="line">    -h, --help                 output usage information</span><br><span class="line">    -u, --username &lt;username&gt;  The user to authenticate as</span><br><span class="line">    -p, --password &lt;password&gt;  The user<span class="string">'s password</span></span><br></pre></td></tr></table></figure>
+<p>所以我们已经拿到了参数了。但是，让用户在空白的地方输入他们的密码作为选项有一点难用。让我们解决它。</p>
+<h2 id="从输入流中读取文本和密码">从输入流中读取文本和密码</h2><p>另一种通用的取回用户的内容的脚本方式是从标准输入流中读。这可以通过 <code>process.stdin</code> 实现，但是再说一次，已经有很多 <code>npm</code> 包提供了非常好的 API 给我们使用。很多都是基于 <code>callback</code> 或者 <code>promises</code>，但是我们将使用 <a href="https://www.npmjs.com/package/co-prompt" target="_blank" rel="external">co-prompt</a> （基于 <a href="https://www.npmjs.com/package/co" target="_blank" rel="external">co</a>），因此我们可以利用 ES6 的 <code>yield</code> 关键词。这让我们写异步的代码而不需要 <code>callbacks</code> ，看起来更加脚本化。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install --save co co-prompt</span><br></pre></td></tr></table></figure>
+<p>为了组合使用 <code>yield</code> 和 <code>co-prompt</code> ，我们需要通过一些 <code>co</code> 的魔法来包裹我们的代码：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">+ <span class="keyword">var</span> co = <span class="built_in">require</span>(<span class="string">'co'</span>);</span><br><span class="line">+ <span class="keyword">var</span> prompt = <span class="built_in">require</span>(<span class="string">'co-prompt'</span>);</span><br><span class="line">  <span class="keyword">var</span> program = <span class="built_in">require</span>(<span class="string">'commander'</span>);</span><br><span class="line">...</span><br><span class="line">  .option(<span class="string">'-u, --username &lt;username&gt;'</span>, <span class="string">'The user to authenticate as'</span>)</span><br><span class="line">  .option(<span class="string">'-p, --password &lt;password&gt;'</span>, <span class="string">'The user\'s password'</span>)</span><br><span class="line">  .action(<span class="function"><span class="keyword">function</span>(<span class="params">file</span>) </span>&#123;</span><br><span class="line">+    co(<span class="function"><span class="keyword">function</span> *(<span class="params"></span>) </span>&#123;</span><br><span class="line">+      <span class="keyword">var</span> username = <span class="keyword">yield</span> prompt(<span class="string">'username: '</span>);</span><br><span class="line">+      <span class="keyword">var</span> password = <span class="keyword">yield</span> prompt.password(<span class="string">'password: '</span>);</span><br><span class="line">       <span class="built_in">console</span>.log(<span class="string">'user: %s pass: %s file: %s'</span>,</span><br><span class="line">-          program.username, program.password, file);</span><br><span class="line">+          username, password, file);</span><br><span class="line">+    &#125;);</span><br><span class="line">  &#125;)</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>现在快速测试一下。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ snippet my_awesome_file</span><br><span class="line">username: kannonboy</span><br><span class="line">password: *************************</span><br><span class="line">user: kannonboy pass: correcthorsebatterystaple file: my_awesome_file</span><br></pre></td></tr></table></figure>
+<p>很棒！唯一的窍门就是ES6的 <code>yield</code>，所以这只能在用户运行在 node 4.0.0+上面。但是我们可以通过加入 <code>--harmony</code> 标志让 0.11.2 版本的也可以正常使用。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- #!/usr/bin/env node</span><br><span class="line">+ #!/usr/bin/env node --harmony</span><br><span class="line">  var co = require('co');</span><br><span class="line">  var prompt = require('co-prompt');</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<h2 id="发送_snippet">发送 snippet</h2><p>Bitbucket拥有一套非常漂亮的 <a href="https://confluence.atlassian.com/display/BITBUCKET/Snippets+endpoint" target="_blank" rel="external">API</a>。在这个例子中我将关注传输单一的文件，但我们可以发送整个目录，改变我们的入口配置，加一些代码等，如果我们需要的话。我最喜欢的node HTTP 客户端是 <a href="https://www.npmjs.com/package/superagent" target="_blank" rel="external">superagent</a> ，所以让我们把它加入项目中。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install --save superagent</span><br></pre></td></tr></table></figure>
+<p>现在就让我们将从用户收集到的数据发送给服务器。 <code>superagent</code> 其中一个优点就是在它在处理文件上拥有非常好的API。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">+ <span class="keyword">var</span> request = <span class="built_in">require</span>(<span class="string">'superagent'</span>);</span><br><span class="line">  <span class="keyword">var</span> co = <span class="built_in">require</span>(<span class="string">'co'</span>);</span><br><span class="line">  <span class="keyword">var</span> prompt = <span class="built_in">require</span>(<span class="string">'co-prompt'</span>);</span><br><span class="line">...</span><br><span class="line">  .action(<span class="function"><span class="keyword">function</span>(<span class="params">file</span>) </span>&#123;</span><br><span class="line">    co(<span class="function"><span class="keyword">function</span> *(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="keyword">var</span> username = <span class="keyword">yield</span> prompt(<span class="string">'username: '</span>);</span><br><span class="line">      <span class="keyword">var</span> password = <span class="keyword">yield</span> prompt.password(<span class="string">'password: '</span>);</span><br><span class="line">-     <span class="built_in">console</span>.log(<span class="string">'user: %s pass: %s file: %s'</span>,</span><br><span class="line">-         file, username, password);</span><br><span class="line">+     request</span><br><span class="line">+       .post(<span class="string">'https://api.bitbucket.org/2.0/snippets/'</span>)</span><br><span class="line">+       .auth(username, password)</span><br><span class="line">+       .attach(<span class="string">'file'</span>, file)</span><br><span class="line">+       .set(<span class="string">'Accept'</span>, <span class="string">'application/json'</span>)</span><br><span class="line">+       .end(<span class="function"><span class="keyword">function</span> (<span class="params">err, res</span>) </span>&#123;</span><br><span class="line">+         <span class="keyword">var</span> link = res.body.links.html.href;</span><br><span class="line">+         <span class="built_in">console</span>.log(<span class="string">'Snippet created: %s'</span>, link);</span><br><span class="line">+       &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>现在让我们测试一下。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ snippet my_awesome_file</span><br><span class="line">username: kannonboy</span><br><span class="line">password: *************************</span><br><span class="line">Snippet created: https://bitbucket.org/snippets/kannonboy/yq7r8</span><br></pre></td></tr></table></figure>
+<p>我们的 snippet 已经发送了！\o/</p>
+<h2 id="输出错误与代码">输出错误与代码</h2><p>到现在为止我们已经处理了一切正确的情况，但是如果我们上传失败或者用户输入错误的信息呢？<code>UNIX-y</code>的方法来处理错误就是将标准的错误信息输出并且以非0的状态码结束程序，所以我们也这样子做。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">  request</span><br><span class="line">    .post(<span class="string">'https://api.bitbucket.org/2.0/snippets/'</span>)</span><br><span class="line">    .auth(username, password)</span><br><span class="line">    .attach(<span class="string">'file'</span>, filename, file)</span><br><span class="line">    .set(<span class="string">'Accept'</span>, <span class="string">'application/json'</span>)</span><br><span class="line">    .end(<span class="function"><span class="keyword">function</span> (<span class="params">err, res</span>) </span>&#123;</span><br><span class="line">+     <span class="keyword">if</span> (!err &amp;&amp; res.ok) &#123;</span><br><span class="line">        <span class="keyword">var</span> link = res.body.links.html.href;</span><br><span class="line">        <span class="built_in">console</span>.log(<span class="string">'Snippet created: %s'</span>, link);</span><br><span class="line">+       process.exit(<span class="number">0</span>);</span><br><span class="line">+     &#125;</span><br><span class="line">+</span><br><span class="line">+     <span class="keyword">var</span> errorMessage;</span><br><span class="line">+     <span class="keyword">if</span> (res &amp;&amp; res.status === <span class="number">401</span>) &#123;</span><br><span class="line">+       errorMessage = <span class="string">"Authentication failed! Bad username/password?"</span>;</span><br><span class="line">+     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (err) &#123;</span><br><span class="line">+       errorMessage = err;</span><br><span class="line">+     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">+       errorMessage = res.text;</span><br><span class="line">+     &#125;</span><br><span class="line">+     <span class="built_in">console</span>.error(errorMessage);</span><br><span class="line">+     process.exit(<span class="number">1</span>);</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+<p>这样子就可以处理错误了。</p>
+<h2 id="终端输出彩色化">终端输出彩色化</h2><p>如果你的用户是在使用体面的 <code>shell</code> ，这里也有一些包提供给你使用让你方便彩色化的输出。我喜欢 <a href="https://www.npmjs.com/package/chalk" target="_blank" rel="external">chalk</a> ，因为它拥有干净可链式的API以及自动检测用户的 <code>shell</code> 支持的颜色。这是有益的提示如果你想将你的脚本分享给 windows 用户的话。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install --save chalk</span><br></pre></td></tr></table></figure>
+<p><code>chalk</code> 的命令能够彩色输出同时还能方便跟常规字符串串联起来。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">+ <span class="keyword">var</span> chalk = <span class="built_in">require</span>(<span class="string">'chalk'</span>);</span><br><span class="line">  <span class="keyword">var</span> request = <span class="built_in">require</span>(<span class="string">'superagent'</span>);</span><br><span class="line">  <span class="keyword">var</span> co = <span class="built_in">require</span>(<span class="string">'co'</span>);</span><br><span class="line">...</span><br><span class="line">   .set(<span class="string">'Accept'</span>, <span class="string">'application/json'</span>)</span><br><span class="line">   .end(<span class="function"><span class="keyword">function</span> (<span class="params">err, res</span>) </span>&#123;</span><br><span class="line">     <span class="keyword">if</span> (!err &amp;&amp; res.ok) &#123;</span><br><span class="line">       <span class="keyword">var</span> link = res.body.links.html.href;</span><br><span class="line">-      <span class="built_in">console</span>.log(<span class="string">'Snippet created: %s'</span>, link);</span><br><span class="line">+      <span class="built_in">console</span>.log(chalk.bold.cyan(<span class="string">'Snippet created: '</span>) + link);</span><br><span class="line">       process.exit(<span class="number">0</span>);</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     <span class="keyword">var</span> errorMessage;</span><br><span class="line">     <span class="keyword">if</span> (res &amp;&amp; res.status === <span class="number">401</span>) &#123;</span><br><span class="line">       errorMessage = <span class="string">"Authentication failed! Bad username/password?"</span>;</span><br><span class="line">     &#125; <span class="keyword">else</span> <span class="keyword">if</span> (err) &#123;</span><br><span class="line">       errorMessage = err;</span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       errorMessage = res.text;</span><br><span class="line">     &#125;</span><br><span class="line">-    <span class="built_in">console</span>.error(errorMessage);</span><br><span class="line">+    <span class="built_in">console</span>.error(chalk.red(errorMessage));</span><br><span class="line">     process.exit(<span class="number">1</span>);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+<p>让我们旋转一下（这里我使用了截图，以便你能看到极好的颜色）。</p>
+<p class="user_img"><img title="彩色化输出截图" class="test_img" src="/img/post/cnt1992/terminal-colors.png" alt="彩色化输出截图"></p>
+<h2 id="渲染_ACSII_进度条">渲染 <code>ACSII</code> 进度条</h2><p><code>snippets</code>的API实际上支持任何类型的文件（最多10MB），但是当文件比较大或者网速特别慢的时候就需要在命令行界面显示上传文件进度了。命令行解决方案就是优雅的 <code>ASCII</code> 进度条。</p>
+<p><a href="https://www.npmjs.com/package/progress" target="_blank" rel="external">progress</a> 是现在最常用的 <code>npm</code> 包用来渲染进度条。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install --save progress</span><br></pre></td></tr></table></figure>
+<p><code>progress</code>的API非常简单而且可扩展，唯一的问题就是 <code>superagent</code> 当前node版本没有事件能够订阅我们上传的进度。</p>
+<p>我们可以通过创建一个 <a href="https://nodejs.org/api/stream.html#stream_class_stream_readable" target="_blank" rel="external">可读的流</a> 并且增加一个事件来触发请求。然后我们初始化进度条为0，当事件触发的时候不断增加。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">+ <span class="keyword">var</span> fs = <span class="built_in">require</span>(<span class="string">'fs'</span>);</span><br><span class="line">+ <span class="keyword">var</span> ProgressBar = <span class="built_in">require</span>(<span class="string">'progress'</span>);</span><br><span class="line">  <span class="keyword">var</span> chalk = <span class="built_in">require</span>(<span class="string">'chalk'</span>);</span><br><span class="line">  <span class="keyword">var</span> request = <span class="built_in">require</span>(<span class="string">'superagent'</span>);</span><br><span class="line">...</span><br><span class="line">  <span class="keyword">var</span> username = <span class="keyword">yield</span> prompt(<span class="string">'username: '</span>);</span><br><span class="line">  <span class="keyword">var</span> password = <span class="keyword">yield</span> prompt.password(<span class="string">'password: '</span>);</span><br><span class="line"></span><br><span class="line">+ <span class="keyword">var</span> fileSize = fs.statSync(file).size;</span><br><span class="line">+ <span class="keyword">var</span> fileStream = fs.createReadStream(file);</span><br><span class="line">+ <span class="keyword">var</span> barOpts = &#123;</span><br><span class="line">+   width: <span class="number">20</span>,</span><br><span class="line">+   total: fileSize,</span><br><span class="line">+   clear: <span class="literal">true</span></span><br><span class="line">+ &#125;;</span><br><span class="line">+ <span class="keyword">var</span> bar = <span class="keyword">new</span> ProgressBar(<span class="string">' uploading [:bar] :percent :etas'</span>, barOpts);</span><br><span class="line">+</span><br><span class="line">+ fileStream.on(<span class="string">'data'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">chunk</span>) </span>&#123;</span><br><span class="line">+   bar.tick(chunk.length);</span><br><span class="line">+ &#125;);</span><br><span class="line"></span><br><span class="line">  request</span><br><span class="line">    .post(<span class="string">'https://api.bitbucket.org/2.0/snippets/'</span>)</span><br><span class="line">    .auth(username, password)</span><br><span class="line">-   .attach(<span class="string">'file'</span>, file)</span><br><span class="line">+   .attach(<span class="string">'file'</span>, fileStream)</span><br><span class="line">    .set(<span class="string">'Accept'</span>, <span class="string">'application/json'</span>)</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>下面是一个比较快的网速下上传大约6MB的文件的截图：</p>
+<p class="user_img"><img title="上传文件进度条" class="test_img" src="/img/post/cnt1992/progress-bar.gif" alt="上传文件进度条"></p>
+<p>很棒！用户现在就能够看到他们上传的进度并且知道什么时候上传完成。</p>
+<h2 id="总结">总结</h2><p>我们只不过接触了用Node开发命令行脚本的冰山一角。在每一期的 <a href="http://blog.codinghorror.com/the-principle-of-least-power/" target="_blank" rel="external">Atwood’s Law</a> 都有很多 <code>npm</code> 包优雅地处理标准输入、管理并行任务、监听文件、管道流、压缩、ssh、git、还有任何你能用 <code>Bash</code> 做到的。更多地，还有非常好的API来处理子进程如果你需要其他shell脚本处理（当JavaScript处理不了的时候）。</p>
+<p>我们上面例子的源码是在 <a href="https://bitbucket.org/tpettersen/bitbucket-snippet" target="_blank" rel="external">available on Bitbucket</a> 的license下，并且已经发布到 <a href="https://npmjs.org/package/bitbucket-snippet" target="_blank" rel="external">npm仓库</a>。我这里也提一些上面没有讲到的概念，比如 <code>OAuth</code> ，这样子你就不需要每次都输入用户名跟密码。如果你想自己简单体验一下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ npm install -g bitbucket-snippet</span><br><span class="line">$ snippet --help</span><br></pre></td></tr></table></figure>
+<p>如果你觉得本教程有帮助，发现了bug或者有其他更酷的Node.js脚本建议，可以在Twiiter私信我。（我是 <a href="https://twitter.com/kannonboy" target="_blank" rel="external">@kannonboy</a>）</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<blockquote>
+<p>本文译自 <a href="https://developer.atlassian.com/blog/2015/11/scripting-with-node/">Building command line tools with Node.js</a>，介绍了如何通过Node.js来创建命令行脚本工具，介绍了很多实用的<code>npm</code>包等。翻译水平有限，敬请指正~</p>
+</blockquote>]]>
+    
+    </summary>
+    
+      <category term="Node.js" scheme="http://aotu.io/tags/Node-js/"/>
+    
+      <category term="command line tools" scheme="http://aotu.io/tags/command-line-tools/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[What's New in Safari 9.0]]></title>
+    <link href="http://aotu.io/notes/2015/12/23/new-safari-9/"/>
+    <id>http://aotu.io/notes/2015/12/23/new-safari-9/</id>
+    <published>2015-12-22T21:42:19.000Z</published>
+    <updated>2015-12-24T09:51:19.000Z</updated>
+    <content type="html"><![CDATA[<a id="more"></a>
+<p>苹果的 OS 在不断发展，Safari 亦越变强大性感，在最新的 9.0 版本当中，Safari 增加了不少新的特性，这里主要介绍一下和 Web 前端密切相关的。</p>
+<h2 id="Viewport_Changes">Viewport Changes</h2><p>关于新 Safari 对 Viewport 的影响我们先看下面一段引自苹果开发者官方文档的说明：</p>
+<blockquote>
+<p>Viewport meta tags using “width = content-width” cause the page to scale down to fit content that overflows the viewport bounds. You can override this behavior by adding “shrink-to-fit = no” to your meta tag as shown below. The added value will prevent the page from scaling to fit the viewport.</p>
+</blockquote>
+<p>可以看到 Safari 将会对有内容溢出 Viewport 区域的页面进行缩放适配，使溢出的内容完整展示而不出现滚动条，而在 Viewport 设置中引入了一个新属性 <code>shrink-to-fit = no</code>，该属性可以禁止这种缩放行为的发生。</p>
+<p>下面我们具体看一下该体贴行为对页面的影响。</p>
+<p>在 Safari 9.0 之前的版本，当 viewport meta 标签的 content 属性有设置的时候，<strong>如果页面内容溢出 viewport 的定义区域</strong>，那么页面将会出现滚动条，如下面的页面，该页面的 viewport 设置为：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta <span class="property">name</span>=<span class="string">"viewport"</span> content=<span class="string">"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"</span> &gt;</span><br></pre></td></tr></table></figure>
+<p><a href="http://missoy.me/mihan/h5/shop/index_nofit.html" target="_blank" rel="external">NotFixed</a></p>
+<p>截图如下：</p>
+<p><img src="/img/post/mihanX/safari-9/fit.jpg" alt="image"></p>
+<p>然而在 Safari 9.0 的版本，即使 viewport 设置了 <code>initial-scale=1.0</code> 和 <code>user-scalable=no</code>，Safari 不仅重置了设定好的最小缩放值限制，而且还重新恢复了用户对页面进行缩放的操作权限，<a href="http://missoy.me/mihan/h5/shop/index_nofit.html" target="_blank" rel="external">上述页面</a>在 Safari 9.0 中的截图如下：</p>
+<p><img src="/img/post/mihanX/safari-9/notfit.jpg" alt="image"></p>
+<p>从上面的截图可以看到，Safari的缩放行为对页面视觉破坏性还是比较厉害的，如果溢出的内容很多的话，页面就会被缩得更小了。</p>
+<p>在 viewport 设置添加 <code>shrink-to-fit = no</code> 这个属性后，设置如下：</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta <span class="property">name</span>=<span class="string">"viewport"</span> content=<span class="string">"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no,shrink-to-fit = no"</span> &gt;</span><br></pre></td></tr></table></figure>
+<p>Safari 就不会再对页面进行缩放处理，恢复之前版本的处理方式，</p>
+<p><a href="http://missoy.me/mihan/h5/shop/index_fit.html" target="_blank" rel="external">Fixed</a></p>
+<p>截图如下：</p>
+<p><img src="/img/post/mihanX/safari-9/fit.jpg" alt="image"></p>
+<p>在日常的需求中，尽管内容溢出页面的情况不会太常见，但为了增强页面的容错能力，保证页面视觉的正常显示，在 viewport 设置中应该加上 <code>shrink-to-fit = no</code> 新属性。</p>
+<h2 id="Safari内容拦截扩展">Safari内容拦截扩展</h2><p>Safari 9.0 新增了内容拦截扩展，该扩展程序能够便捷高效地拦截 cookies、图片、资源文件、弹窗等内容，不仅可以在 OS X 上使用，在 iOS 上也同样适用。</p>
+<h3 id="iOS">iOS</h3><p>内容拦截扩展程序负责提供一个 JSON 文件给 Safari，这个 JSON 文件包含了一个数组，数组里面可以配置相关规则（主要由 triggers 和 actions 组成 ）拦截指定的内容，Safari 会将该 JSON 文件转换成字节代码，转换后的字节代码被应用到所有加载资源，有效地避免了用户浏览器的信息泄露到扩展程序。</p>
+<p>内容拦截扩展程序的核心就是通过 JSON 文件的配置和传送，Safari 接收到之后就可以根据 JSON 的配置对相应的加载资源进行适配完成拦截。</p>
+<p>Xcode内设有内容拦截应用模版（Content Blocker App Extension template），里面有一个 <code>blockerList.json</code> JSON 文件，默认设置是这样的：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        "<span class="attribute">action</span>": <span class="value">&#123;</span><br><span class="line">            "<span class="attribute">type</span>": <span class="value"><span class="string">"block"</span></span><br><span class="line">        </span>&#125;</span>,</span><br><span class="line">        "<span class="attribute">trigger</span>": <span class="value">&#123;</span><br><span class="line">            "<span class="attribute">url-filter</span>": <span class="value"><span class="string">"webkit.org/images/icon-gold.png"</span></span><br><span class="line">        </span>&#125;</span><br><span class="line">    </span>&#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>表示对站点 webkit.org 的一张名为 icon-gold.png 的图片进行拦截。</p>
+<p>除了可以从加载资源上拦截外，还可以通过 CSS 选择器对元素进行隐藏，如下面的配置会将站点所有 class 名为 “ads” 的 div 进行 <code>display: none !important;</code> 样式处理。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        "<span class="attribute">action</span>": <span class="value">&#123;</span><br><span class="line">            "<span class="attribute">selector</span>": <span class="value"><span class="string">"div.ads"</span></span>,</span><br><span class="line">            "<span class="attribute">type</span>": <span class="value"><span class="string">"css-display-none"</span></span><br><span class="line">        </span>&#125;</span>,</span><br><span class="line">        "<span class="attribute">trigger</span>": <span class="value">&#123;</span><br><span class="line">            "<span class="attribute">url-filter</span>": <span class="value"><span class="string">".*"</span></span><br><span class="line">        </span>&#125;</span><br><span class="line">    </span>&#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p><strong> 注意：由于 32 位架构的设备性能限制，iOS上的内容拦截扩展只适用在 64 位架构的设备上，苹果从 A7 处理器开始采用 64位架构，因此 iPhone 5s + 的机器才可能使用此扩展应用 </strong></p>
+<p>关于参数 action 和 trigger 的更多介绍可以参阅：</p>
+<p><img src="/img/post/mihanX/safari-9/blocker_8.jpg" alt="image"> </p>
+<p><a href="https://webkit.org/blog/3476/content-blockers-first-look/" target="_blank" rel="external">Introduction to WebKit Content Blockers</a></p>
+<p><a href="https://www.hackingwithswift.com/safari-content-blocking-ios9" target="_blank" rel="external">Safari Content Blocking in iOS 9: a tutorial by example</a></p>
+<h4 id="一个简单的内容拦截扩展应用">一个简单的内容拦截扩展应用</h4><p>实现一个拦截扩展应用很简单，现在我们以 <a href="http://missoy.me/mihan/h5/shop/index.html" target="_blank" rel="external">拍拍小店首页</a> 为例，拦截顶部广告区域：</p>
+<p><img src="/img/post/mihanX/safari-9/blocker_1.jpg" alt="image"></p>
+<p>Update Xcode 到最新版本，打开 Xcode，新建立一个 iOS Single View Application 项目（blocker-demo），如图所示：</p>
+<p><img src="/img/post/mihanX/safari-9/blocker_2.jpg" alt="image"></p>
+<p>然后新建立一个 Target，在 Application Extension 模版中选中 Content Blocker Extension：</p>
+<p><img src="/img/post/mihanX/safari-9/blocker_3.jpg" alt="image"></p>
+<p>完成之后，就可以在项目中看到刚才新增的 Target 文件夹（blocker），可以找到一个名为 <code>blockerList.json</code>的 JSON 文件，在里面就可以配置需要拦截内容的规则了，如图所示：</p>
+<p><img src="/img/post/mihanX/safari-9/blocker_4.jpg" alt="image"></p>
+<p>（顶部广告区域的 class 名为 <code>mod_ad</code>， 例子中的配置将会将顶部广告区域隐藏。）</p>
+<p>然后以整个项目为编译对象，选择需要测试的模块器（这里选择了 iPhone6）运行程序 ，<strong> 切记不要选中 content blocker 的 Target 为编译对象运行，在模拟器上不能生效 </strong>。</p>
+<p>运行后我们看到白茫茫的一片，模拟器默认打开了刚才新建立的应用，这时候我们需要回到主界面（command + shift + h）进入系统设置界面， 到 Safari &gt;Content Blockers 里面启动内容拦截扩展，如图所示：</p>
+<p><img src="/img/post/mihanX/safari-9/blocker_5.jpg" alt="image"></p>
+<p>启动 Safari，打开<a href="http://missoy.me/mihan/h5/shop/index.html" target="_blank" rel="external">拍拍小店首页</a>，这时候我们可以看到，启动内容拦截扩展之后，顶部的广告区域被隐藏了</p>
+<p><img src="/img/post/mihanX/safari-9/blocker_6.jpg" alt="image"></p>
+<p>用 Safari 的 Web 检查器看了一下页面，发现用户样式表里针对顶部广告区域多了一个 <code>display: none !important;</code>样式</p>
+<p><img src="/img/post/mihanX/safari-9/blocker_7.jpg" alt="image"></p>
+<p>最后需要将程序打包，才能在真机运行，貌似需要 688RMB 的开发者帐号，土豪们可以尽情试一试。</p>
+<h3 id="OS_X">OS X</h3><p>在 OS X Safari 的扩展创建器（Extension Builder）加入拦截 JSON 文件（如下图）或者在 Safari 扩展对象中使用新增的 setContentBlocker API 就可以实现内容拦截功能了</p>
+<p><img src="https://developer.apple.com/library/prerelease/ios/releasenotes/General/WhatsNewInSafari/Art/ExtensionBuilder_AdBlocker_2x.png" alt="image"></p>
+<p><strong> 需要注意的是，用于拦截内容的 onbeforeload 事件和 canLoad 信息已被弃用 </strong></p>
+<p>更多有关 Safari 内容拦截扩展介绍：</p>
+<p><a href="https://www.hackingwithswift.com/safari-content-blocking-ios9" target="_blank" rel="external">Safari Content Blocking in iOS 9: a tutorial by example</a></p>
+<p><a href="http://www.cnblogs.com/CocoonJin/p/4701050.html" target="_blank" rel="external">iOS 9之Safari广告拦截器（Content Blocker）</a></p>
+<h2 id="System_Font_Support">System Font Support</h2><h3 id="-apple-system">-apple-system</h3><p>苹果操作系统会从两种不同外观和大小的字体进行自动转换去调节系统新字体 “San Francisco”，可以通过 CSS 规则</p>
+<pre><code><span class="attribute">font-family</span>: <span class="string">-apple-system, sans-serif;</span>
+</code></pre><p>让系统智能选择适配操作系统的字体。</p>
+<p>可以看一下下面两张在系统 OS X 10.11.1 下的对比图：</p>
+<p>没有添加 <code>-apple-system</code> 属性值：</p>
+<p><img src="/img/post/mihanX/safari-9/sys-font-no.png" alt="image"></p>
+<p>添加了 <code>-apple-system</code> 属性值：</p>
+<p><img src="/img/post/mihanX/safari-9/sys-font-yes.png" alt="image"></p>
+<p>可以看到添加了 <code>-apple-system</code>，字体变得更圆润锐利</p>
+<p><strong>建议：在 <code>font-family</code> 属性加上 <code>-apple-system</code> 属性值。</strong></p>
+<p>图片看不出差别的同学请用 OS X Safari 9.0 打开以下链接：</p>
+<p><a href="http://missoy.me/mihan/demo/sys-font.html" target="_blank" rel="external">System Font Support</a></p>
+<p><img src="/img/post/mihanX/safari-9/sys-font-qrcode.png" alt="image"></p>
+<p>更多关于 System Font Support 介绍 ：<a href="https://webkit.org/blog/3709/using-the-system-font-in-web-content/" target="_blank" rel="external">Using the System Font in Web Content</a></p>
+<p>附：<a href="http://www.jiemian.com/article/392197.html" target="_blank" rel="external">《在吐槽iOS 9的新字体之前，你应该了解这些》</a></p>
+<h3 id="iOS_text-style_keywords">iOS text-style keywords</h3><p>Safari 9.0除了支持 <code>-apple-system</code> 新字体特性之外，在 iOS 平台提供了更丰富更具活力的文本样式，该文本样式不仅仅是特定的字体，包括所有的 <code>font</code> 样式，如字重和字号，因此只能以 <code>font</code> 来定义：</p>
+<ul>
+<li>font: -apple-system-body;</li>
+<li>font: -apple-system-headline;</li>
+<li>font: -apple-system-subheadline;</li>
+<li>font: -apple-system-caption1;</li>
+<li>font: -apple-system-caption2;</li>
+<li>font: -apple-system-footnote;</li>
+<li>font: -apple-system-short-body;</li>
+<li>font: -apple-system-short-headline;</li>
+<li>font: -apple-system-short-subheadline;</li>
+<li>font: -apple-system-short-caption1;</li>
+<li>font: -apple-system-short-footnote;</li>
+<li>font: -apple-system-tall-body;</li>
+</ul>
+<p>加上这些属性在 iOS 上会有不同的表现：</p>
+<p><img src="/img/post/mihanX/safari-9/sys-font.png" alt="image"></p>
+<p>有兴趣的同事去 <a href="http://missoy.me/mihan/demo/sys-font.html" target="_blank" rel="external">Demo</a> 页看一下：</p>
+<p><img src="/img/post/mihanX/safari-9/sys-font-qrcode.png" alt="image"></p>
+<h2 id="CSS_Scroll_Snapping">CSS Scroll Snapping</h2><p>2015年3月26日，W3C的CSS工作组发布了CSS滚动界限点模块（CSS Scroll Snap Points Level 1）的首份工作草案（First Public Working Draft）。在浏览可以连续上下滚动或左右滚动的连续页面或一组图片时，通过触摸屏的触摸滑动或鼠标滚轴的滚动操作可以获得较好用户体验。</p>
+<p>Safari 9.0 的新特性支持强大的 CSS Scroll Snap，利用这个特性，我们可以用CSS轻松实现网站常见的轮播图滚动特效</p>
+<p>我们先看一下 <a href="http://missoy.me/mihan/demo/scroll-snap.html" target="_blank" rel="external">Demo</a> 感受一下 ，请用 Safari 9.0 打开</p>
+<p><img src="/img/post/mihanX/safari-9/scroll-snap_9.jpg" alt="image"></p>
+<p>使用 Scroll Snap 需要的结构包含装载滚动元素的容器和需要滚动的元素：</p>
+<pre><code>&lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"scroll_container"</span>&gt;
+    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"scroll_elements"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"scroll_elements"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"scroll_elements"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+    &lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"scroll_elements"</span>&gt;&lt;/<span class="keyword">div</span>&gt;
+&lt;/<span class="keyword">div</span>&gt;
+</code></pre><p>Scroll Snap 一共有5个CSS属性可使用，分别是 </p>
+<ul>
+<li><p>scroll-snap-type：定义滚动界限的类型，有三个属性值可选， <code>none</code> | <code>mandatory</code> | <code>proximity</code>，初始值为 <code>none</code>，<strong>目前 WebKit 只支持 <code>mandatory</code></strong>。</p>
+</li>
+<li><p>scroll-snap-points-x：定义滚动容器 X 轴方向的 scroll sanp 点，有两个属性值可选，<code>none</code>| <code>repeat(&lt;length&gt;)</code>，初始值为 <code>none</code></p>
+</li>
+<li><p>scroll-snap-points-y：定义滚动容器 Y 轴方向的 scroll sanp 点，有两个属性值可选，<code>none</code> | <code>repeat(&lt;length&gt;)</code>，初始值为 <code>none</code></p>
+</li>
+<li><p>scroll-snap-destination：定义滚动元素在滚动容器的对齐坐标点，属性值为 <code>&lt;position&gt;</code>，初始值为：<code>0px 0px</code></p>
+</li>
+<li><p>scroll-snap-coordinate：定义滚动元素与滚动容器对齐点重合的坐标点，属性值为 <code>none</code> | <code>&lt;position&gt;</code>，初始值为 <code>none</code></p>
+</li>
+</ul>
+<p>属性 <em>scroll-snap-type</em> 、<em>scroll-snap-points-x</em>、<em>scroll-snap-points-y</em> 和 <em>scroll-snap-destination</em> 应用在容器元素</p>
+<p>属性 <em>scroll-snap-coordinate</em> 应用在滚动元素</p>
+<p>滚动容器 scroll snap 坐标点 和 滚动元素 scroll snap 坐标点分别如下图红色十字和黄色十字所示：</p>
+<p><img src="/img/post/mihanX/safari-9/scroll-snap_10.png" alt="image"></p>
+<p>此时的设置是：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">.scroll_container</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">-webkit-scroll-snap-type</span>:<span class="value"> mandatory</span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">-webkit-scroll-snap-destination</span>:<span class="value"> <span class="number">50%</span> <span class="number">50%</span></span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="class">.scroll_elements</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">-webkit-scroll-snap-coordinate</span>:<span class="value"> <span class="number">50%</span> <span class="number">50%</span></span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>属性详细使用情况请参阅 <a href="http://www.w3.org/TR/css-snappoints-1/" target="_blank" rel="external">CSS Scroll Snap Points Module Level 1</a></p>
+<h3 id="需要注意的">需要注意的</h3><ul>
+<li><p>该草案还在不断修进改进，WebKit 目前只支持带 -webkit- 前辍的写法</p>
+</li>
+<li><p>要启用 scroll snap 效果，滚动容器必须具有非 <code>none</code> 值的属性 <code>scroll-snap-type</code> </p>
+</li>
+<li><p>滚动容器 <code>scroll-snap-points-x</code> 和 <code>scroll-snap-points-y</code> 的属性设置会忽略滚动元素 <code>scroll-snap-coordinate</code> 属性设置</p>
+</li>
+<li><p>滚动容器 <code>scroll-snap-destination</code> 属性与滚动元素 <code>scroll-snap-coordinate</code> 总是成对出现的</p>
+</li>
+<li><p>滚动内容发生改变（如滚动容器大小、滚动元素大小、节点的改变等）使得滚动元素的 scroll snap 点不在滚动容器的 scroll snap 点的时候，滚动偏移值会发生改变。</p>
+</li>
+<li><p>不同尺寸的滚动元素混合在一起发生滚动的时候，在 X 或 Y 轴方向上离滚动容器 scroll snap 点最近的滚动元素 scroll snap 点方向轴将会与滚动容器 scroll snap 点的方向轴重合（存在滚动区域的时候）。</p>
+</li>
+</ul>
+<p>更多关于 scroll-snap 属性 Demo 可查看 <a href="https://www.webkit.org/blog/4017/scroll-snapping-with-css-snap-points/" target="_blank" rel="external">Scroll Snapping with CSS Snap Points</a></p>
+<h2 id="Initial_Letter_Support">Initial Letter Support</h2><p>Safari 9.0 支持 CSS <code>initial-letter</code>(要带 -webkit- 前辍) 属性了，以前我们通过伪元素 <code>::first-letter</code>实现首字下沉的效果，但是局限性比较多：</p>
+<ul>
+<li><p>首字母的高度需要通过调整字号大小实现，比较难精确到需要设置的高度</p>
+</li>
+<li><p>段落字号改变的时候，首字母字号并不能自适应改变，因此并不能自适应实现对齐</p>
+</li>
+</ul>
+<p><img src="/img/post/mihanX/safari-9/initial-letter_2.jpg" alt="image"></p>
+<p>CSS <code>initial-letter</code> 属性能很好的解决这些问题，我们先看一下它的属性值： </p>
+<ul>
+<li><p>normal – 初始值</p>
+</li>
+<li><p>[&lt;number&gt; &lt;integer&gt;] – 定义首字母的大小和下沉位置</p>
+<ul>
+<li><p>&lt;number&gt; 首字母的大小，大小值为正数值，字高占据的行数为单位，如 “2” 表示首字母高大小占据段落两行</p>
+</li>
+<li><p>&lt;integer&gt; 首字母下沉的位置，大小值为不为0的整数，若缺省，则以第一个参数 &lt;number&gt;数值为准</p>
+</li>
+</ul>
+</li>
+</ul>
+<p><code>initial-letter</code>属性应用在伪元素 <code>::first-letter</code> 或容器第一个行内子元素</p>
+<p><a href="http://dev.w3.org/csswg/css-inline/#initial-letter-styling" target="_blank" rel="external">w3文档介绍</a>的 EXAMPLE 截图引用如下：</p>
+<blockquote>
+<p><img src="/img/post/mihanX/safari-9/initial-letter.jpg" alt="image"></p>
+</blockquote>
+<p>实验 <a href="http://missoy.me/mihan/demo/initial-letter.html" target="_blank" rel="external">Demo</a> 如下：</p>
+<p><img src="/img/post/mihanX/safari-9/initial-letter_3.png" alt="image"></p>
+<h2 id="Backdrop_Filters">Backdrop Filters</h2><p>CSS背景滤镜属性 <code>backdrop-filter</code> 可以让元素的背景或元素层级以下的元素加上滤镜效果，以下的属性值在 Safari 9.0 得到了全面支持： </p>
+<ul>
+<li><p><code>blur(&lt;length&gt;)</code>：模糊，原始效果值为 <code>0px</code>，不接受负值</p>
+</li>
+<li><p><code>brightness([ &lt;number&gt; | &lt;percentage&gt; ])</code>：亮度，原始效果值为 <code>1</code> 或 <code>100%</code>，不接受负值</p>
+</li>
+<li><p><code>contrast([ &lt;number&gt; | &lt;percentage&gt; ])</code>：对比度，原始效果值为 <code>1</code> 或 <code>100%</code>，不接受负值</p>
+</li>
+<li><p><code>drop-shadow( &lt;length&gt;{2,3} &lt;color&gt;?)</code>：投影，原始效果值为所有长度值为 <code>0</code>，长度值至少2个，最多3个，<strong>注意：不支持投影扩展值和混合投影</strong></p>
+</li>
+<li><p><code>grayscale([ &lt;number&gt; | &lt;percentage&gt; ] )</code>：灰度，原始效果值为 <code>0</code>，最大值为 <code>1</code> 或 <code>100%</code>，不接受负值</p>
+</li>
+<li><p><code>hue-rotate( &lt;angle&gt;)</code>：相位，原始效果值为 <code>0deg</code></p>
+</li>
+<li><p><code>invert( [ &lt;number&gt; | &lt;percentage&gt; ])</code>：反相，原始效果值为 <code>0</code>，最大值为 <code>1</code> 或 <code>100%</code>，不接受负值</p>
+</li>
+<li><p><code>opacity([ &lt;number&gt; | &lt;percentage&gt; ] )</code>：透明度，原始效果值为 <code>1</code>，最大值为 <code>1</code> 或 <code>100%</code>，不接受负值</p>
+</li>
+<li><p><code>saturate([ &lt;number&gt; | &lt;percentage&gt; ])</code>：饱和度，原始效果值为 <code>1</code>，不接受负值</p>
+</li>
+<li><p><code>sepia([ &lt;number&gt; | &lt;percentage&gt; ])</code>：乌贼墨，原始效果值为 <code>0</code>，最大值为 <code>1</code> 或 <code>100%</code>，不接受负值 </p>
+</li>
+</ul>
+<p>滤镜属性 <code>filter</code> 同样具有以上的属性值，与背景滤镜<code>backdrop-filter</code> 不同的是，<code>filter</code> 作用于元素本身（文本、背景等）以其子元素，而 <code>backdrop-filter</code> 只作用于元素本身的背景（文本及其子元素不受影响）以及其层级下面的其它元素，具体的测试参考下面的 <a href="http://missoy.me/mihan/demo/filter.html" target="_blank" rel="external">Demo</a></p>
+<p><img src="/img/post/mihanX/safari-9/filter2.jpg" alt="image"> </p>
+<p><img src="/img/post/mihanX/safari-9/filter.jpg" alt="image"></p>
+<p>更多关于 <code>backdrop-filter</code></p>
+<p>WebKit.org：<a href="https://webkit.org/blog/3632/introducing-backdrop-filters/" target="_blank" rel="external">Introducing Backdrop Filters</a></p>
+<p>w3c文档：<a href="https://drafts.fxtf.org/filters/#typedef-filter-function-list" target="_blank" rel="external">typedef-filter-function-list</a></p>
+<h2 id="CSS3_Feature_Queries">CSS3 Feature Queries</h2><p>Safari 9.0 支持了 CSS3 功能查询 <code>@supports</code>，可以对 CSS 属性(包括但不限于带前辍的属性，如 -webkit-,-moz- 等)进行检测</p>
+<h3 id="单个条件查询">单个条件查询</h3><figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 检测是否支持 display:flexbox，如果支持侧执行中括号的内容 */</span></span><br><span class="line"><span class="at_rule">@supports</span> ( <span class="attribute">display</span>: flexbox ) &#123;</span><br><span class="line">  <span class="class">.selector</span>&#123;</span><br><span class="line">  	...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="多个单件查询">多个单件查询</h3><p>可以使用逻辑关键字 <code>not</code>、<code>and</code>、<code>or</code> 进行多个单件查询</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@supports ( box-shadow: <span class="number">2</span>px <span class="number">2</span>px <span class="number">2</span>px black ) or</span><br><span class="line">          ( -moz-box-shadow: <span class="number">2</span>px <span class="number">2</span>px <span class="number">2</span>px black ) or</span><br><span class="line">          ( -webkit-box-shadow: <span class="number">2</span>px <span class="number">2</span>px <span class="number">2</span>px black ) or</span><br><span class="line">          ( -o-box-shadow: <span class="number">2</span>px <span class="number">2</span>px <span class="number">2</span>px black ) &#123;</span><br><span class="line">  .selector&#123;</span><br><span class="line">  	...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="需要注意的地方">需要注意的地方</h3><ul>
+<li><p><code>@supports</code> 后面总是跟着一个空格符和一个括号，<code>逻辑关键字</code>前后总有一个空格符。因此，写查询条件的时候</p>
+  <figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 错误的写法 */</span></span><br><span class="line"><span class="annotation">@supports</span> <span class="string">display:</span> flexbox &#123;</span><br><span class="line"> 	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@supports</span>(<span class="string">display:</span> flexbox)&#123;</span><br><span class="line"> 	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@supports</span> (<span class="string">display:</span> flexbox)and(-webkit-scroll-snap-<span class="string">type:</span>mandatory) &#123;</span><br><span class="line"> 	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 正确的写法 */</span></span><br><span class="line"><span class="annotation">@supports</span> (<span class="string">display:</span> flexbox) &#123;</span><br><span class="line"><span class="comment">//...</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="annotation">@supports</span> (<span class="string">display:</span> flexbox) and (-webkit-scroll-snap-<span class="string">type:</span>mandatory) &#123;</span><br><span class="line"> 	<span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>多个单件查询，当有多个逻辑关键字混合使用的时候，查询语句最外层最多只有一个逻辑关键字：</p>
+  <figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 错误的写法 */</span></span><br><span class="line">@supports (A) <span class="operator">or</span> (B) <span class="operator">and</span> (C) &#123;<span class="comment"></span><br><span class="line">//...</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 正确的写法 */</span></span><br><span class="line">@supports (A) <span class="operator">or</span> ((B) <span class="operator">and</span> (C)) &#123;<span class="comment"></span><br><span class="line">//...</span></span><br><span class="line">&#125;</span><br><span class="line">@supports ((A) <span class="operator">or</span> (B)) <span class="operator">and</span> (C) &#123;<span class="comment"></span><br><span class="line">//...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p><code>@supports</code> 更详细说明可参考：<a href="http://www.w3.org/TR/css3-conditional/#at-supports" target="_blank" rel="external">at-supports</a>。</p>
+<p><a href="http://missoy.me/mihan/demo/@supports.html" target="_blank" rel="external">Demo测试</a></p>
+<p><img src="/img/post/mihanX/safari-9/@supports2.jpg" alt="image"></p>
+<h2 id="CSS4_Selectors">CSS4 Selectors</h2><p>以下 CSS4 选择器在 Safari 9.0 完全支持了：</p>
+<ul>
+<li>属性选择器忽略大小写标识（Case-insensitive attribute selectors）</li>
+<li><code>:any-link</code></li>
+<li><code>:lang</code></li>
+<li><code>:matches</code></li>
+<li><code>:not</code></li>
+<li><code>:nth-child</code></li>
+<li><code>:placeholder-shown</code></li>
+</ul>
+<h3 id="Case-insensitive">Case-insensitive</h3><p>一般情况下，选择符中属性名和值的大小写敏感性取决于文档语言的敏感性，为了使其匹配忽略大小写敏感性以及其文档语言的敏感性，可以在属性选择器的关闭符<code>]</code>前加上标识符 <code>i</code>，这样不管在什么文档，都能忽略大小写敏感性，如以下例子：</p>
+<p>结构：</p>
+<pre><code>&lt;<span class="keyword">div</span> <span class="type">class</span>=<span class="string">"box"</span> title=<span class="string">"BOX"</span>&gt;Box&lt;/<span class="keyword">div</span>&gt;
+</code></pre><p>样式：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* .box初始背景色为白色 */</span></span><br><span class="line"><span class="class">.box</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">100px</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">100px</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">margin</span>:<span class="value"> <span class="number">10px</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#fff</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">text-align</span>:<span class="value"> center</span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">line-height</span>:<span class="value"> <span class="number">100px</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">word-break</span>:<span class="value"> break-all</span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">word-wrap</span>:<span class="value"> break-word</span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">background</span>:<span class="value"> <span class="hexcolor">#fff</span></span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 属性值大小写敏感，完全匹配，.box背景变黑色 */</span></span><br><span class="line"><span class="class">.box</span><span class="attr_selector">[title="BOX"]</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">background</span>:<span class="value"> <span class="hexcolor">#000</span></span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 用了 CSS4 的 Case-insensitive 属性选择器，若浏览器支持，大小写不再敏感，能完成匹配，.box背景生效变为灰色 */</span></span><br><span class="line"><span class="class">.box</span><span class="attr_selector">[title="box" i]</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">background</span>:<span class="value"> <span class="hexcolor">#ccc</span></span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>关于 Case-insensitive 更详细介绍：<a href="http://www.w3.org/TR/selectors4/#attribute-case" target="_blank" rel="external">w3介绍文档 - Case-insensitive</a> </p>
+<p>测试 <a href="http://missoy.me/mihan/demo/css4_selector.html" target="_blank" rel="external">Demo</a></p>
+<p><img src="/img/post/mihanX/safari-9/css4_selector.jpg" alt="image"></p>
+<h3 id="伪类_:any-link">伪类 :any-link</h3><p>w3文档介绍大概的描述是这样的：</p>
+<blockquote>
+<p>如果元素有定义伪类 <code>:link</code>或 <code>:visited</code> ，<code>:any-link</code>将会对其进行匹配。</p>
+</blockquote>
+<p>于是写了 Demo 验证了一下</p>
+<p>HTML:</p>
+<pre><code><span class="tag">&lt;<span class="title">a</span> <span class="attribute">href</span>=<span class="value">"http://aotu.io/"</span> <span class="attribute">title</span>=<span class="value">""</span> <span class="attribute">class</span>=<span class="value">"lk"</span>&gt;</span>凹凸Team链接<span class="tag">&lt;/<span class="title">a</span>&gt;</span>
+</code></pre><p>CSS:</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">.lk</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">display</span>:<span class="value"> block</span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">width</span>:<span class="value"> <span class="number">100px</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">height</span>:<span class="value"> <span class="number">30px</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">line-height</span>:<span class="value"> <span class="number">30px</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">text-align</span>:<span class="value"> center</span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 黑色背景 */</span></span><br><span class="line"><span class="class">.lk</span><span class="pseudo">:link</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">background</span>:<span class="value"> <span class="hexcolor">#000</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#fff</span></span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 黄色背景 */</span></span><br><span class="line"><span class="class">.lk</span><span class="pseudo">:visited</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">background</span>:<span class="value"> <span class="hexcolor">#ff0</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#333</span></span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 红色背景 */</span></span><br><span class="line"><span class="class">.lk</span><span class="pseudo">:any-link</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">background</span>:<span class="value"> <span class="hexcolor">#ff3737</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#fff</span></span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 白色背景 */</span></span><br><span class="line"><span class="class">.lk</span><span class="pseudo">:hover</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">background</span>:<span class="value"> <span class="hexcolor">#fff</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#333</span></span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 灰色背景 */</span></span><br><span class="line"><span class="class">.lk</span><span class="pseudo">:active</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">background</span>:<span class="value"> <span class="hexcolor">#ccc</span></span></span>;</span><br><span class="line">	<span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#333</span></span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>结果发现：</p>
+<ul>
+<li><p><code>:any-link</code> Safari 9.0 生效了，Chrome、Firefox 并没有生效。</p>
+</li>
+<li><p>伪类 <code>:any-link</code> 的确会对已定义有的伪类<code>:link</code> 和 <code>:visited</code>匹配，并重新覆盖元素相同的CSS属性， 而 <code>:hover</code> 和 <code>:active</code> 并没有匹配成功，<code>:hover</code> 和 <code>:active</code> 依然生效</p>
+</li>
+<li><p>CSS代码解析的时候渲染 <code>:any-link</code> 前就渲染了 <code>:link</code> 和 <code>:visited</code>，因此匹配成功了，而 <code>:hover</code> 和 <code>:active</code> 出现在 <code>:any-link</code> 后面，并不能匹配成功</p>
+</li>
+</ul>
+<p>若加上 <code>-webkit-</code> 前辍，Chrome 亦能生效。</p>
+<p>如果将 <code>:any-link</code> 出现位置改变，<code>:any-link</code> 始终匹配出现在他之前的 Link 相关伪类，有兴趣的同学可以试一下。</p>
+<p>小小总结了一下：</p>
+<ul>
+<li><p><code>:any-link</code> Safari 9.0 不需要加前辍，Chrome、Firefox 浏览器需要加 <code>-webkit-</code>、<code>-moz-</code> 前辍。</p>
+</li>
+<li><p><code>:any-link</code> 匹配有效性和书写顺序有关，<code>:any-link</code> 只对出现在其之前的 Link 伪类匹配生效。</p>
+</li>
+</ul>
+<h4 id="建议">建议</h4><p><strong>写 a 标签样式的时候，在 <code>:hover</code> 和 <code>:active</code> 前应该加上 <code>:any-link</code> 伪类样式，覆盖系统默认的 <code>:link</code> 和 <code>:visited</code>伪类样式。如下所示：</strong></p>
+<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">a</span>&#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="tag">a</span><span class="pseudo">:-webkit-any-link</span>&#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="tag">a</span><span class="pseudo">:-moz-any-link</span>&#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="tag">a</span><span class="pseudo">:any-link</span>&#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="tag">a</span><span class="pseudo">:hover</span>&#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="tag">a</span><span class="pseudo">:active</span>&#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>关于 <code>:any-link</code> 更详细介绍： <a href="http://www.w3.org/TR/selectors4/#the-any-link-pseudo" target="_blank" rel="external">w3介绍文档 - :any-link</a> </p>
+<p>实验 <a href="http://missoy.me/mihan/demo/css4_selector.html" target="_blank" rel="external">Demo</a></p>
+<p><img src="/img/post/mihanX/safari-9/css4_selector.jpg" alt="image"></p>
+<h3 id="伪类_:matches()">伪类 :matches()</h3><p><code>:matches()</code> 是一种类似函数的伪类，可以将不同的选择器以数组形式混合形成一个选择器组，我们可以将之看作是CSS的一种语法糖，请看下面的例子：</p>
+<pre><code><span class="pseudo">:matches(section</span>, <span class="tag">article</span>, <span class="tag">aside</span>, <span class="tag">nav</span>) <span class="tag">h1</span> <span class="rules">{
+  <span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#BADA55</span></span></span>;
+}</span>
+
+<span class="comment">/* 相当于下面的代码 */</span>
+<span class="tag">section</span> <span class="tag">h1</span>,
+<span class="tag">article</span> <span class="tag">h1</span>, 
+<span class="tag">aside</span> <span class="tag">h1</span>,
+<span class="tag">nav</span> <span class="tag">h1</span> <span class="rules">{
+  <span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#BADA55</span></span></span>;
+}</span>
+</code></pre><p>更方便书写一些复杂的选择器，如：</p>
+<pre><code><span class="pseudo">:matches(section</span>, <span class="tag">article</span>, <span class="tag">aside</span>, <span class="tag">nav</span>) <span class="pseudo">:matches(h1</span>, <span class="tag">h2</span>, <span class="tag">h3</span>, <span class="tag">h4</span>, <span class="tag">h5</span>, <span class="tag">h6</span>) <span class="rules">{
+    <span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#BADA55</span></span></span>;
+}</span>
+
+<span class="comment">/* 相当于下面的代码 */</span>
+<span class="tag">section</span> <span class="tag">h1</span>, <span class="tag">section</span> <span class="tag">h2</span>, <span class="tag">section</span> <span class="tag">h3</span>, <span class="tag">section</span> <span class="tag">h4</span>, <span class="tag">section</span> <span class="tag">h5</span>, <span class="tag">section</span> <span class="tag">h6</span>, 
+<span class="tag">article</span> <span class="tag">h1</span>, <span class="tag">article</span> <span class="tag">h2</span>, <span class="tag">article</span> <span class="tag">h3</span>, <span class="tag">article</span> <span class="tag">h4</span>, <span class="tag">article</span> <span class="tag">h5</span>, <span class="tag">article</span> <span class="tag">h6</span>, 
+<span class="tag">aside</span> <span class="tag">h1</span>, <span class="tag">aside</span> <span class="tag">h2</span>, <span class="tag">aside</span> <span class="tag">h3</span>, <span class="tag">aside</span> <span class="tag">h4</span>, <span class="tag">aside</span> <span class="tag">h5</span>, <span class="tag">aside</span> <span class="tag">h6</span>, 
+<span class="tag">nav</span> <span class="tag">h1</span>, <span class="tag">nav</span> <span class="tag">h2</span>, <span class="tag">nav</span> <span class="tag">h3</span>, <span class="tag">nav</span> <span class="tag">h4</span>, <span class="tag">nav</span> <span class="tag">h5</span>, <span class="tag">nav</span> <span class="tag">h6</span> <span class="rules">{
+    <span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#BADA55</span></span></span>;
+}</span>
+</code></pre><p>减少重复的书写：</p>
+<pre><code><span class="class">.links</span><span class="pseudo">:matches(</span><span class="pseudo">:hover</span>, <span class="pseudo">:focus</span>, <span class="pseudo">:active)</span> <span class="rules">{
+    <span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#BADA55</span></span></span>;
+}</span>
+
+<span class="comment">/* 相当于下面的代码 */</span>
+<span class="class">.links</span><span class="pseudo">:hover</span>, <span class="class">.links</span><span class="pseudo">:focus</span>, <span class="class">.links</span><span class="pseudo">:active</span> <span class="rules">{
+    <span class="rule"><span class="attribute">color</span>:<span class="value"> <span class="hexcolor">#BADA55</span></span></span>;
+}</span>    
+</code></pre><p><strong>注意：<code>:matches()</code>不能嵌套而且不能与 <code>:not()</code> 一起使用</strong>，以下的写法都是不允许的：</p>
+<pre><code><span class="comment">/* Doesn't work */</span>
+:<span class="function"><span class="title">matches</span><span class="params">(:not(...)</span></span>)
+
+<span class="comment">/* Doesn't work */</span>
+:<span class="function"><span class="title">not</span><span class="params">(:matches(...)</span></span>)
+
+<span class="comment">/* Doesn't work */</span>
+:<span class="function"><span class="title">matches</span><span class="params">(:matches(...)</span></span>)
+</code></pre><p>更多关于 <code>:matches()</code> 可参考 </p>
+<p>CSS-tricks ：<a href="https://css-tricks.com/almanac/selectors/m/matches/" target="_blank" rel="external">:matches()</a></p>
+<p>W3文档：<a href="http://www.w3.org/TR/selectors4/#matches" target="_blank" rel="external">matches</a></p>
+<h3 id="伪类_:placeholder-shown">伪类 :placeholder-shown</h3><p>如果元素 E 设置了属性 <code>placeholder</code>，属性值不为空并出现在页面的时候，那么<code>E:placeholder-shown</code> 就能匹配到该元素，当 <code>placeholder</code> 文本在页面消失的时候，匹配到的相应样式也会消失，如以下 <a href="http://missoy.me/mihan/demo/css4_selector.html" target="_blank" rel="external">Demo</a> 所示:</p>
+<p><img src="/img/post/mihanX/safari-9/css4_selector.jpg" alt="image"></p>
+<h3 id="伪类_:nth-child，:not，:lang">伪类 :nth-child，:not，:lang</h3><p>详细用法有兴趣的同学可以到 w3文档 查阅：</p>
+<p><a href="http://www.w3.org/TR/selectors4/#the-lang-pseudo" target="_blank" rel="external">:lang - #the-lang-pseudo</a></p>
+<p><a href="http://www.w3.org/TR/selectors4/#negation" target="_blank" rel="external">:not - #negation</a> </p>
+<p><a href="http://www.w3.org/TR/selectors4/#the-nth-child-pseudo" target="_blank" rel="external">:nth-child - #the-nth-child-pseudo</a></p>
+<h2 id="Unprefixed_CSS_Properties">Unprefixed CSS Properties</h2><p>以下CSS属性在 Safari 9.0 已完全支持，不用再带 <code>-webkit-</code> 前辍：</p>
+<ul>
+<li>transition</li>
+<li>transition-delay</li>
+<li>transition-duration</li>
+<li>transition-property</li>
+<li>transition-timing-function</li>
+<li>animation</li>
+<li>cursor: zoom-in</li>
+<li>cursor: zoom-out</li>
+<li>perspective</li>
+<li>perspective-origin</li>
+<li>transform</li>
+<li>transform-origin</li>
+<li>transform-style</li>
+<li>@keyframes</li>
+<li>animation-name</li>
+<li>animation-duration</li>
+<li>animation-timing-function</li>
+<li>animation-iteration-count</li>
+<li>animation-direction</li>
+<li>animation-play-state</li>
+<li>animation-delay</li>
+<li>animation-fill-mode</li>
+<li>order</li>
+<li>align-content</li>
+<li>align-items</li>
+<li>align-self</li>
+<li>justify-content</li>
+<li>flex</li>
+<li>flex-basis</li>
+<li>flex-direction</li>
+<li>flex-flow</li>
+<li>flex-grow</li>
+<li>flex-shrink</li>
+<li>flex-wrap</li>
+<li>break-after</li>
+<li>break-before</li>
+<li>break-inside</li>
+<li>columns</li>
+<li>column-count</li>
+<li>column-fill</li>
+<li>column-gap</li>
+<li>column-rule</li>
+<li>column-rule-color</li>
+<li>column-rule-style</li>
+<li>column-rule-width</li>
+<li>column-span</li>
+<li>column-width</li>
+<li>alt</li>
+</ul>
+<h2 id="Responsive_Design_Mode">Responsive Design Mode</h2><p>Safari 9.0 推出了响应式设计模式，command + option + R 或在“开发 – 进入响应式设计模式”可以进入，界面如下图：</p>
+<p><img src="/img/post/mihanX/safari-9/rdm.png" alt="image"></p>
+<p>这里有：</p>
+<ul>
+<li>现主流 iPhone/iPad 机型尺寸</li>
+<li>iOS8.1系统模拟（iphone、ipad、ipod touch）</li>
+<li>苹果系主流分辨率</li>
+<li>Safari 9.0.1 Mac</li>
+<li>Chrome – Mac/Windows</li>
+<li>FireFox – Mac/Windows</li>
+<li>IE7 - IE10 –Windows（ 好样的！）</li>
+<li>页面精度</li>
+</ul>
+<p>点击选中的机型图标还可以以不同的方式展示，如 iPhone 的横屏，iPad 的分屏等</p>
+<p>响应式设计模式 Chrome 浏览器早早就有，但单从苹果产品的调试去看，个人更喜欢 Safari 的响应式设计模式，无论从外观、体验以及专注度，都要优于 Chrome，Safari一直在进步，从不怀疑 Apple Developer 的级数。</p>
+<p><img src="/img/post/mihanX/safari-9/chrome.png" alt="image"></p>
+<h2 id="Web_Inspector_Redesign">Web Inspector Redesign</h2><p>之前所了解到的 Web Inspector 版本：</p>
+<p><img src="/img/post/mihanX/safari-9/web_inspector_1.png" alt="image"></p>
+<p>（从苹果开发者文档介绍了解到的，没使用过，目测是 Safari 4.0 or 之前的）</p>
+<p><img src="/img/post/mihanX/safari-9/web_inspector_2.png" alt="image"></p>
+<p>（直接 google 图片了解到的，没使用过，目测是 Safari 6.0 重新设计那款）</p>
+<p>Safari 9.0 的 Web 检查器经过了重新设计，更直观易用，用户体验更棒。</p>
+<p>开发任务 Tab 切换更简易快捷，新的渲染时间线框架更容易更细致检测到页面渲染的情况</p>
+<p><img src="/img/post/mihanX/safari-9/web_inspector_3.png" alt="image"></p>
+<p>元素查看，样式修改调试方便，直接点光标直接处于编辑状态了，不明白 Chrome 的为什么点了默认全选，编辑态还有一个输入框的形态，Apple 的极简设计理念无处不在，处处体现着苹果 Design 的基因</p>
+<p><img src="/img/post/mihanX/safari-9/web_inspector_4.png" alt="image"></p>
+<p>断点调试器也哗啦啦地好看易用：</p>
+<p><img src="/img/post/mihanX/safari-9/web_inspector_5.png" alt="image"></p>
+<p>更多的内容有兴趣的同学去体验一下吧，这里就不一一烧图了。</p>
+<div style="color:#fff;">如果说 Chrome Web Inspector 是一名角斗士，那么 Safari Web Inspector 就是一名会写诗的角斗士</div>]]></content>
+    <summary type="html">
+    <![CDATA[<a id="more"></a>
+<p>苹果的 OS 在不断发展，Safari 亦越变强大性感，在最新的 9.0 版本当中，Safari 增加了不少新的特性，这里主要介绍一下和 Web 前端密切相关的。</p>
+<h2 id="Viewport_Changes">Viewpor]]>
+    </summary>
+    
+      <category term="OS X" scheme="http://aotu.io/tags/OS-X/"/>
+    
+      <category term="Safari 9.0" scheme="http://aotu.io/tags/Safari-9-0/"/>
+    
+      <category term="iOS" scheme="http://aotu.io/tags/iOS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title><![CDATA[What Does the Foo Mean]]></title>
+    <link href="http://aotu.io/notes/2015/12/18/etymology-of-foobar/"/>
+    <id>http://aotu.io/notes/2015/12/18/etymology-of-foobar/</id>
+    <published>2015-12-17T21:22:23.000Z</published>
+    <updated>2015-12-24T09:51:19.000Z</updated>
+    <content type="html"><![CDATA[<p>今天在 WebKit 看了 CSS 伪类的文章，其中对 <code>:matches()</code> 的介绍出现了 <code>foo</code> 和 <code>bar</code>：</p>
+<pre><code><span class="pseudo">:matches(</span><span class="class">.foo</span>, <span class="class">.bar</span>) <span class="rules">{
+    <span class="rule"><span class="attribute">background-color</span>:<span class="value"> green</span></span>;
+}</span>
+</code></pre><p>随即想起，以前在不少编程书里经常看到 <code>foo</code>、<code>bar</code> 这对 couple，一直不知道他们的具体含义，于是默默去 google 搜了一下，发现结果都几有意思。</p>
+<p>首先在 <em>Quora</em> 里发现一位名为 <em>Thom Parkin</em> 的网友回答：</p>
+<blockquote>
+<p>“foo” has been (until very recently) always used as part of a pair (with “bar”) when representing arbitrary names in computer science.  This is primarily in the instance of examples.</p>
+<p>Much like the “Hello World” is a standard for examples in computer programming the use of “foo” and “bar” had grown in popularity.</p>
+<p>The origin comes from a common phrase much older than computers and computer programming.</p>
+<p>The choice of “foo” coupled with “bar” is derived from the coloquial acronym FUBAR (pronounced FOO-bar).</p>
+<p>Legendarily from the military world, it represents the phrase:<br>“Fucked Up Beyond All Recognition” (in ‘mixed company’ the first word could be “Fouled”).</p>
+</blockquote>
+<p>大概的意思是说：</p>
+<p>在计算计领域里，“foo” 和 “bar” 通常会成对出现，在举例的时候用作没有明确意义的命名，就好像 “Hellow World” 例子在计算机编程里面作为标准的例子一样，“foo” 和 “bar” 的使用已经变得很流行。</p>
+<p>而该词在常用的习语里面出现的时间远比在计算机或计算机编程里面出现的早，“foo” 和 “bar” 成对出现则起源于口语 “FUBAR” 一词（发音和 Foo-bar 一样）。</p>
+<p>来自军事世界的传说中，“FooBar” 的含义则是 “Fucked Up Beyond All Recognition，全句意思是 “糟糕糟到面目全非/真是混乱不堪” ？</p>
+<p>看完 <em>Thom Parkin</em> 的解释，隐隐约约觉得此词来头不小，但是啊 <em>Thom</em> 的介绍又不够详细，然后继续 search 一下，发现万能 Wiki Sir 对此有更详细的描述。</p>
+<p>Wiki Sir 直接就来一句 “Not to be confused with FUBAR”，心里只想说：666666</p>
+<p>Wiki 对 “Foobar” 一词的定义是这样的：</p>
+<blockquote>
+<p>The terms foobar (/ˈfuːbɑr/), fubar, or foo, bar, baz and qux (alternatively, quux) and sometimes norf[1][2][3][4] and many others[5][6] are sometimes used as placeholder names (also referred to as metasyntactic variables) in computer programming or computer-related documentation.[7] They have been used to name entities such as variables, functions, and commands whose exact identity is unimportant and serve only to demonstrate a concept. The words themselves have no meaning in this usage. Foobar is sometimes used alone; foo, bar, and baz are sometimes used, when multiple entities are needed.</p>
+</blockquote>
+<p>大概意思是：</p>
+<ul>
+<li><p>Foobar 还有一群兄弟姐妹，例如 “fubar” 、“baz”、“qux”、“quux”、“norf”，他们很多时候都会作为占位名（或者作为伪变量）被应用在计算机编程或与计算机相关的文档中。</p>
+</li>
+<li><p>他们被用作变量命名、函数命名、和命令命名，这些命名基本都是不重要的，仅仅作为某个概念阐述的示例，他们本身并没有什么具体含义</p>
+</li>
+<li><p>Foobar有时候单独使用，而当多个这种用法出现的时候， “foo”，“bar”，“baz” 会组合使用。</p>
+</li>
+</ul>
+<p>嗯~~ 原来是这样~~</p>
+<p>那么出处呢？Wiki Sir 介绍得比较详细，有兴趣的同学自己 <a href="https://en.wikipedia.org/wiki/Foobar#History_and_etymology" target="_blank" rel="external">Click Here</a> 去看看原文，在下也试下意译到本文</p>
+<p><em>Foo</em> 一词起源于 20 世纪 30 年代的一个并没有任何意义的词（nonsense word）和 20 世界 40 年代军事术语里面的 “FUBAR” 以及大约在 20 世纪 60 年代麻省理工学院铁路模型技术俱乐部（TMRC）在一个程序上下文用到的词汇。然而，这些词汇之间明确的联系仍然不清晰，从而使得一些有趣的理论学说进一步去定义他们。</p>
+<p><em>Foo</em> 在文献 《Internet Engineering Task Force (IETF) <a href="https://tools.ietf.org/html/rfc3092" target="_blank" rel="external">RFC 3092</a>》里有定义（文献标题为 Etymology of “Foo”），文献给出了 <em>foo</em> 最早的使用记录，就是出现在 20 世纪 30 年代由美国 <em>Bill Holman</em> 创作的连载漫画 <em>Smokey Stover</em>，<em>foo</em> 被用作没有具体含义的词，如下图的 “foomobile”：</p>
+<p><img src="/img/post/mihanX/foo-img-1.jpg" alt="image"></p>
+<p><em>(Smokey Stover driving a “foomobile”)</em></p>
+<p>作者 <em>Holman</em> 说使用这个词是因为他在旧金山唐人街看到一尊中国玉雕像底部的“福”字，<em>foo</em> 大概是 <em>福（fu）</em> 的音译。而当时像 “福祿壽”、“福满处”等象征上帝的虚构形象在中国非常流行。</p>
+<p><em>Smokey Stover</em> 从 1935 连载到 1973，期间一直重点保留着 “foo” 的特征，就好像上面 “foomobile” 的插图。这个词在 20 世纪 30 年代非常流行，除了在 <em>Smokey Stover</em> 出现，还在其它卡通和连载漫画里出现，如由 <em>Bob Clampett</em> 创办的 <em>Looney Tunes（兔巴哥）</em>卡通系列里的 <em>The Daffy Doc</em> 和 <em>Porky in Wackyland</em> 以及漫画 <em>Pogo</em></p>
+<p>接着，<em>Foo</em> 走进了军事俚语 “FUBAR”（Fucked Up Beyond All Recognition）一词中，合并到词里的 “FU”。在第二次世界大战里盟军飞行员用词汇 “foo fighter” 描述各种各样的 UFO 或者一些神秘的空中现象</p>
+<p><em>Foo</em> 第一次在正式的程序类印刷品作为较为人知的词汇出现于 1965 年 TMRC 的一版印刷品，关于紧急开关（scram switches）方面的内容：</p>
+<p>在复杂的模型系统中，一些紧急开关被安装在许多场所附近可以利用的空间里，这些场所有可能会发生突发的不幸事故，如全速前进的火车遇到障碍物。这种模型系统的另一个特性就是调试模拟盘上的数码时钟。当有人按下紧急开关，数码时钟就停止工作，显示屏上亦随之换成 “FOO” 这个词。在 TMRC 里面，紧急开关也因此称作 “Foo开关”（Foo switches）。正因为这样，“foo” 一词录入了 TMRC 语言字典。</p>
+<p>有一本书描述了 MIT（麻省理工学院） 列车室靠门侧的两个分别标上 “foo” 和 “bar” 标签的按钮。在那时期，这两个词通常应用到各种按钮上；当 MIT 的黑客们有新奇想法的时候也会反复使用他们。因此，<em>foo</em> 和 <em>bar</em> 被广泛用作变化不定的命名。在 TMRC 语言字典精简版中有这样的描述：</p>
+<blockquote>
+<p>Multiflush: stop-all-trains-button. Next best thing to the red door button. Also called FOO. Displays “FOO” on the clock when used.</p>
+</blockquote>
+<p>Multiflush（不知道叫啥）：停下所有列车按钮，门边的红色按钮，也叫做 “FOO”，当使用后，时钟上会显示 “FOO”。</p>
+<p>好了，现在终于知道 <em>foo</em>、<em>bar</em> 是什么了，简单总结下就是：</p>
+<ol>
+<li><p>20 世纪 30 年代，一位美国漫画达人在一尊中国玉雕像上看到一个中国字 – “福” ，然后就将其音译成 “foo”，并应用到他自己的漫画上</p>
+</li>
+<li><p>漫画大叔将 “foo” 发扬光大不久，唯恐不乱的军事世界将 “foo” 放到了俚语 “FUBAR” 里面，演变成了 “Foobar”</p>
+</li>
+<li><p>之后 MIT 人才在介绍一项 “complex model system” 的紧急开关中引入了 “foo” 一词，并发表出去，于是乎 MIT 的黑客们一有新奇想法就用 “foo” 一词，并用上了瘾，久而久之大家就对 “foo” 和 “bar” 认识达成了共识</p>
+</li>
+</ol>
+<p>一句话概括就是：<em>Foo</em>、<em>Bar</em> 什么鬼都不是却能代表一切，FUBAR!</p>
+<p>The End</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>今天在 WebKit 看了 CSS 伪类的文章，其中对 <code>:matches()</code> 的介绍出现了 <code>foo</code> 和 <code>bar</code>：</p>
+<pre><code><span class="pseudo">:matc]]>
+    </summary>
+    
+      <category term="Foo" scheme="http://aotu.io/tags/Foo/"/>
+    
+  </entry>
   
   <entry>
     <title><![CDATA[【译】介绍Sass Maps：用法跟例子]]></title>
