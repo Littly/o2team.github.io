@@ -4,7 +4,7 @@
   <subtitle><![CDATA[凹凸实验室]]></subtitle>
   <link href="/atom.xml" rel="self"/>
   <link href="http://aotu.io/"/>
-  <updated>2016-01-05T12:01:18.000Z</updated>
+  <updated>2016-01-06T02:01:36.000Z</updated>
   <id>http://aotu.io/</id>
   
   <author>
@@ -15,217 +15,210 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title><![CDATA[使用Github的webhooks进行网站自动化部署]]></title>
+    <link href="http://aotu.io/notes/2016/01/06/auto-deploy-website-by-webhooks-of-github/"/>
+    <id>http://aotu.io/notes/2016/01/06/auto-deploy-website-by-webhooks-of-github/</id>
+    <published>2016-01-05T17:05:05.000Z</published>
+    <updated>2016-01-06T02:01:36.000Z</updated>
+    <content type="html"><![CDATA[<p>相信很多码农都玩过了<code>Git</code>，如果对<code>Git</code>只是一知半解，可以移步<code>LV</code>写的 <a href="http://aotu.io/notes/2015/11/17/Git-Commands/">GIT常用操作总结</a>，下面介绍到的一些关于 <code>Git</code> 的概念就不再赘述。</p>
+<p>为啥想写这篇文章？主要是因为部门服务器因为安全性原因不允许<code>SCP</code>上传文件进行应用部署，然后有一些应用是放在Github上的，然后部署应用的步骤就变成：</p>
+<p>1.git clone github项目 本地目录<br>2.配置一下应用的pm2.json并reload<br>3.Nginx配置一下反向代理并restart</p>
+<p>当然如果只是一次性部署上去就不再修改的话并没啥问题，但是要是项目持续性修改迭代的话，就比较麻烦了，我们就在不断的重复着上面的步骤。作为一个码农，怎么允许不断的重复同样的工作，于是<code>Github webhooks</code>闪亮登场。</p>
+<a id="more"></a>
+<h2 id="关于Github_webhooks">关于Github webhooks</h2><p>让我们看看 <a href="https://developer.github.com/webhooks/" target="_blank" rel="external">官方</a> 关于Github webhooks的解释：</p>
+<blockquote>
+<p>Webhooks allow you to build or set up integrations which subscribe to certain events on GitHub.com.</p>
+</blockquote>
+<p>提炼出来几个点：</p>
+<ul>
+<li>必须是Github上面的项目</li>
+<li>订阅了确定的事件（包括push/pull等命令）</li>
+<li>自动触发</li>
+</ul>
+<p>刚好符合了这几个条件，那接下来就看看如何进行<code>网站自动化部署</code>，主要会从下面几点来讲解：</p>
+<p>1.自动化<code>shell</code>脚本<br>2.服务端实现<br>3.配置<code>github webhooks</code></p>
+<h2 id="自动化脚本">自动化脚本</h2><p>我之前翻译过一篇文章 <a href="http://aotu.io/notes/2015/12/23/building-command-line-tools-with-node-js/">使用Node.JS创建命令行脚本工具</a>，但是我们现在的自动化脚本直接用 <code>shell</code> 来实现，假设名称为<code>auto_build.sh</code>：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="shebang">#! /bin/bash</span><br><span class="line"></span></span><br><span class="line">SITE_PATH=<span class="string">'/export/Data/aotu.jd.com/index/cnt1992.github.io'</span></span><br><span class="line">USER=<span class="string">'admin'</span></span><br><span class="line">USERGROUP=<span class="string">'admin'</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> <span class="variable">$SITE_PATH</span></span><br><span class="line">git reset --hard origin/master</span><br><span class="line">git clean <span class="operator">-f</span></span><br><span class="line">git pull</span><br><span class="line">git checkout master</span><br><span class="line">chown -R <span class="variable">$USER</span>:<span class="variable">$USERGROUP</span> <span class="variable">$SITE_PATH</span></span><br></pre></td></tr></table></figure>
+<p><strong>Note:</strong> 在执行上面<code>shell</code>脚本之前我们必须第一次手动<code>git clone</code>项目进去，例如：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone github远程项目 /export/Data/aotu<span class="class">.jd</span><span class="class">.com</span>/index/cnt1992<span class="class">.github</span><span class="class">.io</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>shell脚本其实就跟直接在终端运行命令一样，类似于windows下面的BAT批处理命令，更多详细可以查阅资料。</p>
+</blockquote>
+<h2 id="服务端实现">服务端实现</h2><p><code>Github webhooks</code>需要跟我们的服务器进行通信，确保是可以推送到我们的服务器，所以会发送一个带有<code>X-Hub-Signature</code>的<code>POST</code>请求，为了方便我们直接用第三方的库<a href="https://github.com/rvagg/github-webhook-handler" target="_blank" rel="external">github-webhook-handler</a>来接收参数并且做监听事件的处理等工作。</p>
+<p>现在我们可以在<code>shell</code>脚本的同级目录下面执行下面命令初始化一个<code>package.json</code>:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm init <span class="operator">-f</span></span><br></pre></td></tr></table></figure>
+<p>然后执行下面命令安装上面提到的第三方库：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm i -S github-webhook-handler</span><br></pre></td></tr></table></figure>
+<p>接下来创建我们的服务主入口文件<code>index.js</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">touch index.js</span><br></pre></td></tr></table></figure>
+<p>紧接着参考<code>github-webhook-handler</code>的<code>demo</code>编辑我们的<code>index.js</code>：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> http = <span class="built_in">require</span>(<span class="string">'http'</span>);</span><br><span class="line"><span class="keyword">var</span> spawn = <span class="built_in">require</span>(<span class="string">'child_process'</span>).spawn;</span><br><span class="line"><span class="keyword">var</span> createHandler = <span class="built_in">require</span>(<span class="string">'github-webhook-handler'</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 下面填写的myscrect跟github webhooks配置一样，下一步会说；path是我们访问的路径</span></span><br><span class="line"><span class="keyword">var</span> handler = createHandler(&#123; path: <span class="string">'/auto_build'</span>, secret: <span class="string">''</span> &#125;);</span><br><span class="line"></span><br><span class="line">http.createServer(<span class="function"><span class="keyword">function</span> (<span class="params">req, res</span>) </span>&#123;</span><br><span class="line">  handler(req, res, <span class="function"><span class="keyword">function</span> (<span class="params">err</span>) </span>&#123;</span><br><span class="line">    res.statusCode = <span class="number">404</span>;</span><br><span class="line">    res.end(<span class="string">'no such location'</span>);</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;).listen(<span class="number">6666</span>);</span><br><span class="line"></span><br><span class="line">handler.on(<span class="string">'error'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">err</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.error(<span class="string">'Error:'</span>, err.message)</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 监听到push事件的时候执行我们的自动化脚本</span></span><br><span class="line">handler.on(<span class="string">'push'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">event</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'Received a push event for %s to %s'</span>,</span><br><span class="line">    event.payload.repository.name,</span><br><span class="line">    event.payload.ref);</span><br><span class="line"></span><br><span class="line">  runCommand(<span class="string">'sh'</span>, [<span class="string">'./auto_build.sh'</span>], <span class="function"><span class="keyword">function</span>(<span class="params"> txt </span>)</span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(txt);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">rumCommand</span>(<span class="params"> cmd, args, callback </span>)</span>&#123;</span><br><span class="line">    <span class="keyword">var</span> child = spawn( cmd, args );</span><br><span class="line">    <span class="keyword">var</span> response = <span class="string">''</span>;</span><br><span class="line">    child.stdout.on(<span class="string">'data'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"> buffer </span>)</span>&#123; resp += buffer.toString(); &#125;);</span><br><span class="line">    child.stdout.on(<span class="string">'end'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123; callback( resp ) &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 由于我们不需要监听issues，所以下面代码注释掉</span></span><br><span class="line"><span class="comment">//  handler.on('issues', function (event) &#123;</span></span><br><span class="line"><span class="comment">//    console.log('Received an issue event for %s action=%s: #%d %s',</span></span><br><span class="line"><span class="comment">//      event.payload.repository.name,</span></span><br><span class="line"><span class="comment">//      event.payload.action,</span></span><br><span class="line"><span class="comment">//      event.payload.issue.number,</span></span><br><span class="line"><span class="comment">//      event.payload.issue.title)</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>然后利用node管理工具跑起来服务，这里使用了<code>pm2</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pm2 start index.js</span><br></pre></td></tr></table></figure>
+<p>到这一步服务已经跑起来了，但是对外网并不能直接访问到，所以还需要配置一下<code>Nginx</code>做一下反向代理：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">···</span><br><span class="line">server &#123;</span><br><span class="line">    listen <span class="number">80</span>;</span><br><span class="line">    server_name aotu.jd.com;</span><br><span class="line"></span><br><span class="line">    ···</span><br><span class="line">    location /auto_build &#123;</span><br><span class="line">        proxy_pass http:<span class="comment">//127.0.0.1:6666;</span></span><br><span class="line">    &#125;</span><br><span class="line">    ···</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>OK，到这里整个服务已经搭建完成，下一步就只需要配置<code>Github webhooks</code>。</p>
+<h2 id="配置github_webhooks">配置<code>github webhooks</code></h2><p>我们可以在我们的<code>Github</code>上面最右边有一个<code>Settings</code>的Tab，找到<code>Webhooks &amp; services</code>，如下图：</p>
+<p class="user_img"><img src="/img/post/cnt1992/webhooks.png"></p>
+<p>然后点击新建，输入<code>Payload URL</code>跟<code>Secret</code>，确定即可。</p>
+<h2 id="验证">验证</h2><p>绑定成功之后，我们可以试试提交一下代码，然后来到<code>Github</code>看看是否自动触发了接口，如下图：</p>
+<p class="user_img"><img src="/img/post/cnt1992/webhooks-show.png"></p>
+<p>然后随便选择一个点击一下，可以看到<code>200</code>的响应：</p>
+<p class="user_img"><img src="/img/post/cnt1992/webhook-success.png"></p>
+<h2 id="小结">小结</h2><p>上面就是利用<code>Github webhooks</code>进行网站自动化部署的全部内容了，不难发现其实这项技术还是有局限性的，那就是依赖于<code>github</code>，一般我们选择的都是免费github账号，所有项目都对外，一些敏感项目是不适合放置上去的。</p>
+<p>这个时候就考虑这个组里同事推荐的 <a href="http://backup.github.io/backup/v4/" target="_blank" rel="external">backup</a>，自己还没试用，有兴趣可以了解了解。</p>
+]]></content>
+    <summary type="html">
+    <![CDATA[<p>相信很多码农都玩过了<code>Git</code>，如果对<code>Git</code>只是一知半解，可以移步<code>LV</code>写的 <a href="http://aotu.io/notes/2015/11/17/Git-Commands/">GIT常用操作总结</a>，下面介绍到的一些关于 <code>Git</code> 的概念就不再赘述。</p>
+<p>为啥想写这篇文章？主要是因为部门服务器因为安全性原因不允许<code>SCP</code>上传文件进行应用部署，然后有一些应用是放在Github上的，然后部署应用的步骤就变成：</p>
+<p>1.git clone github项目 本地目录<br>2.配置一下应用的pm2.json并reload<br>3.Nginx配置一下反向代理并restart</p>
+<p>当然如果只是一次性部署上去就不再修改的话并没啥问题，但是要是项目持续性修改迭代的话，就比较麻烦了，我们就在不断的重复着上面的步骤。作为一个码农，怎么允许不断的重复同样的工作，于是<code>Github webhooks</code>闪亮登场。</p>]]>
+    
+    </summary>
+    
+      <category term="Github" scheme="http://aotu.io/tags/Github/"/>
+    
+      <category term="webhooks" scheme="http://aotu.io/tags/webhooks/"/>
+    
+  </entry>
+  
+  <entry>
     <title><![CDATA[CSS3动画实践]]></title>
     <link href="http://aotu.io/notes/2016/01/04/css3-animation/"/>
     <id>http://aotu.io/notes/2016/01/04/css3-animation/</id>
     <published>2016-01-04T15:58:00.000Z</published>
-    <updated>2016-01-05T12:01:18.000Z</updated>
-    <content type="html"><![CDATA[<h2 id="需求中常见的css3动画">需求中常见的css3动画</h2><hr>
-<h3 id="一、补间动画/关键帧动画">一、补间动画/关键帧动画</h3><p>常用于实现位移、颜色（透明度）、大小、旋转、倾斜等变化。</p>
-<p><strong>Transitions——简单的动画：起始两帧过渡</strong></p>
+    <updated>2016-01-06T10:58:29.000Z</updated>
+    <content type="html"><![CDATA[<h2 id="需求中常见的css3动画">需求中常见的css3动画</h2><p>需求中常见的css3动画一般有<strong>补间动画（又叫“关键帧动画”）</strong>和<strong>逐帧动画</strong>两种，下面分别介绍：</p>
+<ol>
+<li><p>补间动画/关键帧动画：<br> 常用于实现位移、颜色（透明度）、大小、旋转、倾斜等变化。一般有<code>Transitions</code>和<code>Keyframes animation</code>两种方法实现补间动画。<br> <strong>Transitions：</strong>用于实现简单的动画，只有起始两帧过渡。多用于页面的交互操作，使交互效果更生动活泼。</p>
 <blockquote>
 <p>CSS的<code>transition</code>允许CSS的属性值在一定的时间区间内平滑地过渡。<br>这种效果可以在鼠标单击、获得焦点、被点击或对元素任何改变中触发，并圆滑地以动画效果改变CSS的属性值。</p>
 </blockquote>
-<ul>
-<li><p><strong>应用场景：</strong><br>页面的交互操作</p>
-</li>
-<li><p><strong>优点：</strong><br>使用transition可使交互效果更生动活泼</p>
-</li>
-</ul>
-<p><strong>Keyframes animation——复杂的动画：关键帧较多的动画</strong></p>
+<p> <strong>Keyframes animation：</strong>用于实现较为复杂的动画，一般关键帧较多。</p>
 <blockquote>
-<p>设置动画的关键帧规则。<br><code>animation</code>的<code>timing-function</code>设置为<code>ease</code>、<code>linear</code>或<code>cubic-bezier</code>，它会在每个关键帧之间插入补间动画，产生具有连贯性的动画。</p>
+<p>设置动画的关键帧规则。<br><code>animation</code>的<code>timing-function</code>设置为<code>ease</code>、<code>linear</code>或<code>cubic-bezier</code>，它会在每个关键帧之间插入补间动画，产生具有连贯性的动画。   </p>
 </blockquote>
-<h3 id="二、逐帧动画">二、逐帧动画</h3><blockquote>
-<p>animation的<code>timing-function</code>默认值为<code>ease</code>，它会在每个关键帧之间插入补间动画，所以动画效果是连贯性的。<br>除了<code>ease</code>、<code>linear</code>、<code>cubic-bezier</code>之类的过渡函数都会为其插入补间。<br>有些效果不需要补间，只需要关键帧之间的跳跃，这时应该使用<code>steps</code>过渡方式。<br>更多详细用法请查看：<a href="http://www.cnblogs.com/aaronjs/p/4642015.html" target="_blank" rel="external">深入理解CSS3 Animation 帧动画</a></p>
-</blockquote>
-<ul>
-<li><strong>应用场景：</strong></li>
-</ul>
-<ol>
-<li>loading动画</li>
-<li>Sprite精灵动画（人物运动）——把所有帧都放在一起，通过CSS3的animation控制background-position</li>
-</ol>
-<ul>
-<li><p><strong>精灵动画示例：</strong></p>
-<p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/1-1.gif" alt="[逐帧动画示例]"></p>
-<p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/1-2.png" alt="[逐帧动画示例]"></p>
 </li>
-<li><p><strong>steps中的坑：</strong></p>
-</li>
-</ul>
-<ol>
-<li><p>第一个参数<code>number</code>为指定的间隔数：</p>
-<ul>
-<li>把动画分为 n 步阶段性展示(√)；不是keyframes写的变化次数(×)</li>
-<li><p>上述示例中hand使用不同number值产生不同结果：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">.active</span><span class="class">.share3</span> <span class="class">.hand</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"> wave <span class="function">steps</span>(<span class="number">2</span>,end) <span class="number">2s</span> forwards infinite</span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"><span class="at_rule">@<span class="keyword">-webkit-keyframes</span> wave</span>&#123;</span><br><span class="line">	0%<span class="rules">&#123;<span class="rule"><span class="attribute">background-position</span>:<span class="value"><span class="number">0</span> <span class="number">0</span></span></span>;&#125;</span></span><br><span class="line">  	50%<span class="rules">&#123;<span class="rule"><span class="attribute">background-position</span>:<span class="value"><span class="number">100%</span> <span class="number">0</span></span></span>;&#125;</span></span><br><span class="line">  	100%<span class="rules">&#123;<span class="rule"><span class="attribute">background-position</span>:<span class="value"><span class="number">0</span> <span class="number">0</span></span></span>;&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/1-4.gif" alt="[steps中的坑]"></p>（<code>number</code>为2时的结果）<br><br><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">.active</span><span class="class">.share3</span> <span class="class">.hand</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"> wave <span class="function">steps</span>(<span class="number">1</span>,end) <span class="number">2s</span> forwards infinite</span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"><span class="at_rule">@<span class="keyword">-webkit-keyframes</span> wave</span>&#123;</span><br><span class="line">  0%<span class="rules">&#123;<span class="rule"><span class="attribute">background-position</span>:<span class="value"><span class="number">0</span> <span class="number">0</span></span></span>;&#125;</span></span><br><span class="line">  50%<span class="rules">&#123;<span class="rule"><span class="attribute">background-position</span>:<span class="value"><span class="number">100%</span> <span class="number">0</span></span></span>;&#125;</span></span><br><span class="line">  100%<span class="rules">&#123;<span class="rule"><span class="attribute">background-position</span>:<span class="value"><span class="number">0</span> <span class="number">0</span></span></span>;&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p></p><p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/1-5.gif" alt="[steps中的坑]"></p>（<code>number</code>为1时的结果）<p></p>
-</li>
-</ul>
-</li>
-<li><p>第二个参数可选，接受<code>start</code>和<code>end</code>两个值：</p>
-<ul>
-<li>指定在每个间隔的起点或是终点发生阶跃变化</li>
-<li><p><code>steps(3,start)</code>与<code>steps(3,end)</code>的区别：</p>
-<p></p><p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/1-3.png" alt="[steps中的坑]"></p>（图片来源：<a href="http://www.tuicool.com/articles/neqMVr" target="_blank" rel="external">CSS3 timing-function: steps() 详解</a>）<p></p>
-</li>
-</ul>
-</li>
-<li><p>TIPS：</p>
+<li><p>逐帧动画：</p>
 <blockquote>
-<p><code>step-start</code>等同于<code>steps(1,start)</code>：动画执行时为开始左侧端点的部分为开始<br><code>step-end</code>等同于<code>steps(1,end)</code>：动画执行时以结尾端点为开始，默认值为end</p>
+<p>animation的<code>timing-function</code>默认值为<code>ease</code>，它会在每个关键帧之间插入补间动画，所以动画效果是连贯性的。<br>除了<code>ease</code>、<code>linear</code>、<code>cubic-bezier</code>之类的过渡函数都会为其插入补间。<br>有些效果不需要补间，只需要关键帧之间的跳跃，这时应该使用<code>steps</code>过渡方式。</p>
 </blockquote>
+<p> 更多详细用法请查看：<a href="http://www.cnblogs.com/aaronjs/p/4642015.html" target="_blank" rel="external">《深入理解CSS3 Animation 帧动画》</a>。<br> 逐帧动画可用于<strong>loading动画</strong>，但更多的用于<strong>Sprite精灵动画（人物运动）</strong>。精灵动画把所有帧都放在一起，通过CSS3的<code>animation</code>控制<code>background-position</code>。</p>
+<p> 下面看一个精灵动画的例子：</p>
+ <p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/1-1.gif" alt="[逐帧动画示例]"></p>
+<p> （案例：拍拍无聊者联盟宣传页）</p>
+<p> steps的参数有几个坑，需要特别留意：<br> 第一个参数<code>number</code>为指定的间隔数，指的是把<strong>两个关键帧之间的动画分为n步阶段性展示</strong>，而不是<code>keyframes</code>写的变化次数。<br> 我们将上述案例中hand部分作为例子：由雪碧图可知，手部的摆动一种有两种状态，故<code>keyframes</code>需要写两帧：</p>
+ <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="at_rule">@<span class="keyword">-webkit-keyframes</span> wave</span>&#123;</span><br><span class="line">	0%<span class="rules">&#123;<span class="rule"><span class="attribute">background-position</span>:<span class="value"><span class="number">0</span> <span class="number">0</span></span></span>;&#125;</span></span><br><span class="line">  	50%<span class="rules">&#123;<span class="rule"><span class="attribute">background-position</span>:<span class="value"><span class="number">100%</span> <span class="number">0</span></span></span>;&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p> 设置不同的number值：</p>
+ <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*将`number`设置为2*/</span></span><br><span class="line"><span class="class">.active</span><span class="class">.share3</span> <span class="class">.hand</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"> wave <span class="function">steps</span>(<span class="number">2</span>,end) <span class="number">2s</span> forwards infinite</span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+ <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*将`number`设置为1*/</span></span><br><span class="line"><span class="class">.active</span><span class="class">.share3</span> <span class="class">.hand</span><span class="rules">&#123;</span><br><span class="line">	<span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"> wave <span class="function">steps</span>(<span class="number">1</span>,end) <span class="number">2s</span> forwards infinite</span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+ <p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/1-4.gif" alt="[steps中的坑]"></p>
+<p> （左图：<code>number</code>为2；右图：<code>number</code>为1）</p>
+<p> 第二个参数可选，接受<code>start</code>和<code>end</code>两个值：指定在每个间隔的<strong>起点</strong>或是<strong>终点</strong>发生阶跃变化。通过<a href="http://www.w3.org/" target="_blank" rel="external">W3C</a>中的一张step的工作机制图可以理解：<br> </p><p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/1-2.png" alt="[steps中的坑]"></p>（图片来源：<a href="http://www.w3.org/TR/css3-transitions/" target="_blank" rel="external">W3C</a>）<p></p>
+<p> TIPS：</p>
+<blockquote>
+<p><code>step-start</code>等同于<code>steps(1,start)</code>：动画执行时为开始左侧端点的部分为开始；<br><code>step-end</code>等同于<code>steps(1,end)</code>：动画执行时以结尾端点为开始，默认值为end。</p>
+</blockquote>
+<p> 最后安利一个计算帧数的工具：<a href="http://tid.tenpay.com/labs/css3_keyframes_calculator.html" target="_blank" rel="external">CSS3动画帧数计算器</a></p>
 </li>
 </ol>
-<ul>
-<li><p><strong>工具：</strong></p>
-<p><a href="http://tid.tenpay.com/labs/css3_keyframes_calculator.html" target="_blank" rel="external">CSS3动画帧数计算器</a></p>
-</li>
-</ul>
-<h2 id="CSS动画的优缺点">CSS动画的优缺点</h2><hr>
-<h3 id="一、优点：">一、优点：</h3><blockquote>
+<h2 id="CSS动画的优缺点">CSS动画的优缺点</h2><ol>
+<li>优点：<blockquote>
 <p>简单、高效<br>声明式的<br>不依赖于主线程，采用硬件加速（GPU）<br>简单的控制keyframe animation播放和暂停</p>
 </blockquote>
-<h3 id="二、缺点：">二、缺点：</h3><blockquote>
+</li>
+<li>缺点：<blockquote>
 <p>不能动态修改或定义动画内容<br>不同的动画无法实现同步<br>多个动画彼此无法堆叠</p>
 </blockquote>
-<h2 id="简单做动画：">简单做动画：</h2><hr>
-<p>以此需求为例：<br></p><p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/3-1.jpg" alt="[简单做动画]"></p><p></p>
-<h3 id="一、观察">一、观察</h3><ul>
-<li>哪些元素可以动</li>
-<li>元素可以怎么动</li>
-</ul>
-<h3 id="二、沟通">二、沟通</h3><ul>
-<li>了解设计师的想法  <p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/3-2.JPG" alt="[沟通]"></p></li>
-<li>提出自己的想法</li>
-</ul>
-<h3 id="三、分析">三、分析</h3><ul>
-<li><p>分析动画元素的层次（出现顺序）</p>
-  <p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/3-3.jpg" alt="[分析]"></p>
 </li>
-<li><p>画出动画时间轴</p>
-  <p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/3-4.jpg" alt="[分析]"></p>
-</li>
-<li><p>根据时间轴写出CSS动画时间轴<br>  <strong>方法一：</strong>将所有动画元素放在一个时间轴上（适合于元素较少的情况）</p>
-  <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">a0&#123;-webkit-animation: a0 2s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a0&#123;</span><br><span class="line">            0%&#123;……&#125;</span><br><span class="line">            30%&#123;……&#125;</span><br><span class="line">        &#125;</span><br><span class="line">a1&#123;-webkit-animation: a1 2s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a1&#123;</span><br><span class="line">            0%,30%&#123;……&#125;</span><br><span class="line">            50%&#123;……&#125;</span><br><span class="line">        &#125;</span><br><span class="line">a2&#123;-webkit-animation: a2 2s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a2&#123;</span><br><span class="line">            0%,50%&#123;……&#125;</span><br><span class="line">            75%&#123;……&#125;</span><br><span class="line">        &#125;</span><br><span class="line">a3&#123;-webkit-animation: a3 2s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a3&#123;</span><br><span class="line">            0%,75%&#123;……&#125;</span><br><span class="line">            100%&#123;……&#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
-<p>  <strong>方法二：</strong>同一阶段的动画元素放在一个时间轴上</p>
-  <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">a0&#123;-webkit-animation: a0 0.6s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a0&#123;</span><br><span class="line">            0%&#123;……&#125;</span><br><span class="line">            100%&#123;……&#125;</span><br><span class="line">        &#125;</span><br><span class="line">a1&#123;-webkit-animation: a1 0.4s 0.6s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a1&#123;</span><br><span class="line">            0%&#123;……&#125;</span><br><span class="line">            100%&#123;……&#125;</span><br><span class="line">        &#125;</span><br><span class="line">a2&#123;-webkit-animation: a2 0.5s 1s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a2&#123;</span><br><span class="line">            0%&#123;……&#125;</span><br><span class="line">            100%&#123;……&#125;</span><br><span class="line">        &#125;</span><br><span class="line">a3&#123;-webkit-animation: a3 0.5s 1.5s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a3&#123;</span><br><span class="line">            0%&#123;……&#125;</span><br><span class="line">            100%&#123;……&#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
-</li>
-</ul>
-<h3 id="四、切图">四、切图</h3><ul>
-<li>PS CC 2015修改组/图层名为“<em>*</em>.png”，生成图像资源<p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/3-5.png" alt="[切图]"></p>
-（使用PS CSS 2015切图步骤）</li>
-</ul>
-<h3 id="五、定位">五、定位</h3><ul>
-<li>绝对定位—position:absolute</li>
-<li>sublime插件：<a href="https://github.com/youing/PxRemTranslate" target="_blank" rel="external">PX转REM插件</a></li>
-</ul>
-<h3 id="六、实现">六、实现</h3><ul>
-<li><p>从无到有：</p>
+</ol>
+<h2 id="简单做动画：">简单做动画：</h2><p>总结一下在之前做动画需求时的经验，归纳为以下7个步骤。以此需求为例：<br></p><p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/3-1.jpg" alt="[简单做动画]"></p>（案例：iphone6s推广游戏）<p></p>
 <ol>
+<li><p><strong>观察</strong>——哪些元素可以动？元素可以怎么动？</p>
+<p> 根据视觉稿，分析标题、按钮、人物、背景都可以适当加动画元素。</p>
+</li>
+<li><p><strong>沟通</strong>——了解设计师的想法，并提出自己的想法。</p>
+<p> 这是设计师给出的大致动画过程，具体的过渡及动效没有明确给出，因此可以根据自己的想法与设计师进行沟通。</p>
+ <p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/3-2.JPG" alt="[沟通]"></p>
+</li>
+<li><p><strong>分析</strong>——分析动画元素的层次（出现顺序）；画出动画时间轴；根据时间轴写出CSS动画时间轴。<br> 分析该页面动画的出现可以分为四个层次：</p>
+ <p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/3-3.jpg" alt="[分析]"></p>
+<p> 根据前面的分析画出动画时间轴：</p>
+ <p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/3-4.jpg" alt="[分析]"></p>
+<p> 根据时间轴写出CSS动画时间轴：<br> <strong>方法一：</strong>将所有动画元素放在一个时间轴上（适合于元素较少的情况）。</p>
+ <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">a0&#123;-webkit-animation: a0 2s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a0&#123;</span><br><span class="line">            0%&#123;……&#125;</span><br><span class="line">            30%&#123;……&#125;</span><br><span class="line">        &#125;</span><br><span class="line">a1&#123;-webkit-animation: a1 2s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a1&#123;</span><br><span class="line">            0%,30%&#123;……&#125;</span><br><span class="line">            50%&#123;……&#125;</span><br><span class="line">        &#125;</span><br><span class="line">a2&#123;-webkit-animation: a2 2s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a2&#123;</span><br><span class="line">            0%,50%&#123;……&#125;</span><br><span class="line">            75%&#123;……&#125;</span><br><span class="line">        &#125;</span><br><span class="line">a3&#123;-webkit-animation: a3 2s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a3&#123;</span><br><span class="line">            0%,75%&#123;……&#125;</span><br><span class="line">            100%&#123;……&#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p> <strong>方法二：</strong>同一阶段的动画元素放在一个时间轴上。</p>
+ <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">a0&#123;-webkit-animation: a0 0.6s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a0&#123;</span><br><span class="line">            0%&#123;……&#125;</span><br><span class="line">            100%&#123;……&#125;</span><br><span class="line">        &#125;</span><br><span class="line">a1&#123;-webkit-animation: a1 0.4s 0.6s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a1&#123;</span><br><span class="line">            0%&#123;……&#125;</span><br><span class="line">            100%&#123;……&#125;</span><br><span class="line">        &#125;</span><br><span class="line">a2&#123;-webkit-animation: a2 0.5s 1s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a2&#123;</span><br><span class="line">            0%&#123;……&#125;</span><br><span class="line">            100%&#123;……&#125;</span><br><span class="line">        &#125;</span><br><span class="line">a3&#123;-webkit-animation: a3 0.5s 1.5s forwards;&#125;</span><br><span class="line">    @-webkit-keyframes a3&#123;</span><br><span class="line">            0%&#123;……&#125;</span><br><span class="line">            100%&#123;……&#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>切图</strong>——PS CC 2015修改组/图层名为“<em>*</em>.png”，生成图像资源。<br> 使用PS CSS 2015切图具体步骤如下：</p>
+ <p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/3-5.png" alt="[切图]"></p>
+</li>
+<li><p><strong>定位</strong>——适当使用绝对定位；适当使用rem。<br> 安利一款sublime插件：<a href="https://github.com/youing/PxRemTranslate" target="_blank" rel="external">PX转REM插件</a>。</p>
+</li>
+<li><p><strong>实现</strong></p>
+<p> 从无到有：</p>
+<ul>
 <li>透明度—opacity</li>
 <li>位移—translate</li>
-<li>宽度—width（少用）</li>
-</ol>
+<li><p>宽度—width（少用）</p>
+<p>动起来：</p>
 </li>
-<li><p>动起来：</p>
-<ol>
 <li>2/3D转换—transform</li>
 <li>其他属性</li>
-</ol>
-</li>
 </ul>
-<h3 id="七、润色">七、润色</h3><p style="color:#bbb">后文介绍</p>
+</li>
+<li><p><strong> 润色</strong></p>
+ <p style="color:#bbb">后文介绍</p>
 
-<p><strong>TIPS：不要在before,after里加动画</strong></p>
-<h2 id="不止于“动”：">不止于“动”：</h2><hr>
-<h3 id="一、惯性">一、惯性</h3><ul>
-<li>物体没有停在本应该停止的位置上而是靠惯性<strong>继续摆动一段时间然后反方向摆回来</strong></li>
-<li>惯性在日常的动画需求中应用相当普遍，元素的高速进入都涉及惯性</li>
-<li><p>示例：</p>
-<ol>
-<li>标题快速从左侧划入屏幕中</li>
-<li>标题本应停在屏幕左右居中位置</li>
-<li><p>由于惯性的作用，标题到达居中位置后又向右滑行一小段，再反方向滑回</p>
-<p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-1.png" alt="[惯性]"></p>
-<p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-2.gif" alt="[惯性]"></p>
 </li>
 </ol>
-</li>
-</ul>
-<p><strong>总结：要停不停，要走不走</strong></p>
-<h3 id="二、透视">二、透视</h3><ul>
-<li>物体与观察者的距离远近在静态时通过<strong>物体的大小</strong>来体现  <p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-7.jpg" alt="[透视]"></p>
-  （透视原理图）</li>
-<li>当物体运动时，通过<strong>远近物体不同的运动速度</strong>来体现，从而形成层次感</li>
-<li><strong>近处的物体运动快，远处的物体运动慢</strong></li>
-<li><p>示例：</p>
-<ol>
-<li>云朵与观察者的距离有远近之分（不可能所有的云都在一个平面上）</li>
-<li>设置云朵的飘动动画时，可根据云朵的大小（远近）设置不同的运动速度</li>
-<li><p>近处的云朵飘动的速度比远处的快，从而形成透视</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c1</span>,</span><br><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c2</span>,</span><br><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c4</span>,</span><br><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c6</span></span><br><span class="line"><span class="rules">&#123;</span><br><span class="line">    <span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"> cloudFloat linear <span class="number">6s</span> infinite</span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c3</span>,</span><br><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c5</span>,</span><br><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c7</span></span><br><span class="line"><span class="rules">&#123;</span><br><span class="line">    <span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"> cloudFloat linear <span class="number">10s</span> infinite</span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
-<p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-8.png" alt="[透视]"></p>
-<p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-9.gif" alt="[透视]"></p>
-</li>
-</ol>
-</li>
-</ul>
-<h3 id="三、节奏">三、节奏</h3><ul>
-<li>善用<strong>曲线</strong>和<strong>缓动</strong></li>
-<li><strong>多个元素保持相同节奏</strong></li>
-<li><p>示例：</p>
-<ol>
-<li><p>匀速的呼吸效果：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">.breath</span><span class="rules">&#123;</span><br><span class="line">    <span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"></span><br><span class="line">    breath <span class="number">6s</span> linear infinite</span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
-<p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-10.gif" alt="[节奏]"></p>
-</li>
-<li><p>缓动的呼吸效果：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">.breath</span><span class="rules">&#123;</span><br><span class="line">    <span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"></span><br><span class="line">    breath <span class="number">6s</span> <span class="function">cubic-bezier</span>(.<span class="number">2</span>,.<span class="number">73</span>,.<span class="number">71</span>,.<span class="number">44</span>) infinite</span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
-<p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-11.gif" alt="[节奏]"></p>
-</li>
-<li><p>分析呼吸的函数：</p>
-<p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-12.png" alt="[节奏]"></p>
-<p>（图片来源：<a href="http://isux.tencent.com/animation-factor.html" target="_blank" rel="external">让界面动画更自然——ISUX</a>）</p>
-</li>
-</ol>
-</li>
-</ul>
-<h3 id="四、跟随">四、跟随</h3><ul>
-<li>跟随动作是将物体的各部位拆解，通常是<strong>没有骨架</strong>的部位较容易产生跟随的动作</li>
-<li>例如：<ol>
-<li>一个奔跑的人突然停下，他的衣服头发等可能仍会运动</li>
-<li>其中，人是“主体”，衣服头发等是“附属物”</li>
-</ol>
-</li>
-<li>附属物的动作取决于：<ol>
-<li>主体的动作</li>
-<li>附属物本身的重量和质地</li>
-<li>空气的阻力</li>
-</ol>
-</li>
-<li><strong>主体与附属物之间动作的重叠和追随</strong>，就是鉴定动作流畅性与自然度好坏的标准</li>
-<li>示例：<ol>
-<li>首页主体人物动作触发后，进行小范围的四向运动以模拟人物身体颤动的效果</li>
-<li>人物头饰（花及骨头）与运动主体（人）并非一体，属于附属物</li>
-<li>附属物的运动受主体的运动影响出现同向、延时的运动<p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-17.png" alt="[跟随]"></p>
-<p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-18.gif" alt="[跟随]"></p>
-</li>
-</ol>
-</li>
-</ul>
-<h2 id="优化">优化</h2><hr>
+<p>TIPS：不要在before,after里加动画！</p>
+<h2 id="不止于“动”：">不止于“动”：</h2><ol>
+<li><p><strong>惯性</strong></p>
+<p> 物体没有停在本应该停止的位置上而是靠惯性<strong>继续摆动一段时间然后反方向摆回来</strong>。<br> 惯性在日常的动画需求中应用相当普遍，元素的高速进入都涉及惯性。</p>
 <ul>
+<li>示例：标题快速从左侧划入屏幕中，标题本应停在屏幕左右居中位置，由于惯性的作用，标题到达居中位置后又向右滑行一小段，再反方向滑回。<br><p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-2.gif" alt="[惯性]"></p>（案例：618 APP返场页H5）</li>
+</ul>
+</li>
+<li><p><strong>透视</strong></p>
+<p> 物体与观察者的距离远近在静态时通过<strong>物体的大小</strong>来体现。<br> 当物体运动时，通过<strong>远近物体不同的运动速度</strong>来体现，从而形成层次感。<strong>近处的物体运动快，远处的物体运动慢</strong>。</p>
+ <p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-7.jpg" alt="[透视]"></p>
+<p> （透视原理图）</p>
+<ul>
+<li><p>示例：云朵与观察者的距离有远近之分（不可能所有的云都在一个平面上），设置云朵的飘动动画时，可根据云朵的大小（远近）设置不同的运动速度，近处的云朵飘动的速度比远处的快，从而形成透视。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c1</span>,</span><br><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c2</span>,</span><br><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c4</span>,</span><br><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c6</span></span><br><span class="line"><span class="rules">&#123;</span><br><span class="line">    <span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"> cloudFloat linear <span class="number">6s</span> infinite</span></span>;</span><br><span class="line">&#125;</span></span><br><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c3</span>,</span><br><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c5</span>,</span><br><span class="line"><span class="class">.cover_clouds</span> <span class="class">.c7</span></span><br><span class="line"><span class="rules">&#123;</span><br><span class="line">    <span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"> cloudFloat linear <span class="number">10s</span> infinite</span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+<p></p><p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-9.gif" alt="[透视]"></p>（案例：iphone6s推广游戏）<p></p>
+</li>
+</ul>
+</li>
+<li><p><strong>节奏</strong></p>
+<p> 善用<strong>曲线</strong>和<strong>缓动</strong>可使效果更生动。<br> <strong>多个元素保持相同节奏</strong>，保证画面的动画不过分凌乱。</p>
+<ul>
+<li><p>示例：匀速的呼吸与缓动的呼吸。</p>
+  <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">.breath</span><span class="rules">&#123;</span><br><span class="line">    <span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"></span><br><span class="line">    breath <span class="number">6s</span> linear infinite</span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+  <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class">.breath</span><span class="rules">&#123;</span><br><span class="line">    <span class="rule"><span class="attribute">-webkit-animation</span>:<span class="value"></span><br><span class="line">    breath <span class="number">6s</span> <span class="function">cubic-bezier</span>(.<span class="number">2</span>,.<span class="number">73</span>,.<span class="number">71</span>,.<span class="number">44</span>) infinite</span></span>;</span><br><span class="line">&#125;</span></span><br></pre></td></tr></table></figure>
+  <p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-11.gif" alt="[节奏]"></p>
+<p>  (左图：匀速呼吸效果图；右图：缓动呼吸效果图)<br>跟随动画进行呼吸，可以明显感觉到缓动的呼吸更贴近我们实际的呼吸情况。呼吸函数如下：</p>
+  <p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-12.png" alt="[节奏]"></p>
+<p>  （图片来源：<a href="http://isux.tencent.com/animation-factor.html" target="_blank" rel="external">让界面动画更自然——ISUX</a>）</p>
+</li>
+</ul>
+</li>
+<li><p><strong>跟随</strong></p>
+<p> 跟随动作是将物体的各部位拆解，通常是<strong>没有骨架</strong>的部位较容易产生跟随的动作。例如：一个奔跑的人突然停下，他的衣服头发等可能仍会运动。其中，人是“主体”，衣服头发等是“附属物”。<br> 附属物的动作取决于：<strong>主体的动作</strong>，<strong>附属物本身的重量和质地</strong>，以及<strong>空气的阻力</strong>。<br> <strong>主体与附属物之间动作的重叠和追随</strong>，就是鉴定动作流畅性与自然度好坏的标准。</p>
+<ul>
+<li>示例：首页主体人物动作触发后，进行小范围的四向运动以模拟人物身体颤动的效果。人物头饰（花及骨头）与运动主体（人）并非一体，属于附属物。附属物的运动受主体的运动影响出现同向、延时的运动。<br><p class="user_img"><img src="/img/post/Yettyzyt/css3-animation/4-18.gif" alt="[跟随]"></p>（案例：拍拍七夕活动页—七叻个夕）</li>
+</ul>
+</li>
+</ol>
+<h2 id="优化">优化</h2><ol>
 <li>不用left/right/width/height/margin-top等</li>
 <li>少用color/background等</li>
 <li>使用translate/opacity</li>
 <li>适当开启GPU加速</li>
 <li>适当使用will-change</li>
-</ul>
-<h2 id="参考文章">参考文章</h2><hr>
-<ol>
+</ol>
+<h2 id="参考文章">参考文章</h2><ol>
 <li><a href="http://www.itechzero.com/css3-transition-property-transition-effect-explain.html" target="_blank" rel="external">CSS3 transition 属性过渡效果 详解,Techzero ,2014-04-1</a></li>
 <li><a href="http://www.cnblogs.com/aaronjs/p/4642015.html" target="_blank" rel="external">深入理解CSS3 Animation 帧动画,Aaron,2015-07-13</a></li>
 <li><a href="http://www.tuicool.com/articles/neqMVr" target="_blank" rel="external">CSS3 timing-function: steps() 详解,那个傻瓜瓜,2014-12-30</a></li>
@@ -235,9 +228,9 @@
 </ol>
 ]]></content>
     <summary type="html">
-    <![CDATA[<h2 id="需求中常见的css3动画">需求中常见的css3动画</h2><hr>
-<h3 id="一、补间动画/关键帧动画">一、补间动画/关键帧动画</h3><p>常用于实现位移、颜色（透明度）、大小、旋转、倾斜等变化。</p>
-<p><strong>Transition]]>
+    <![CDATA[<h2 id="需求中常见的css3动画">需求中常见的css3动画</h2><p>需求中常见的css3动画一般有<strong>补间动画（又叫“关键帧动画”）</strong>和<strong>逐帧动画</strong>两种，下面分别介绍：</p>
+<ol>
+<li><p>补间]]>
     </summary>
     
       <category term="CSS3" scheme="http://aotu.io/tags/CSS3/"/>
@@ -251,7 +244,7 @@
     <link href="http://aotu.io/notes/2016/01/02/3D-panorama/"/>
     <id>http://aotu.io/notes/2016/01/02/3D-panorama/</id>
     <published>2016-01-01T23:06:45.000Z</published>
-    <updated>2016-01-05T10:40:01.000Z</updated>
+    <updated>2016-01-06T10:58:29.000Z</updated>
     <content type="html"><![CDATA[<p>在浏览器中实现全景浏览, 听起来是很玄的事情. 但如果你清楚它的原理, 这事就简单多了.<br><a id="more"></a></p>
 <h2 id="前言">前言</h2><p>在之前的一段时间, 朋友圈中出现了一批使用全景图浏览技术的H5页面. 比如探班吴亦凡系列, 或者是探访京东总部大楼找优惠券页面. 在当时, 这几个页面取得了不错的宣传效果. 那么, 这种新奇的全景效果到底是怎样实现的呢?</p>
 <h2 id="基础">基础</h2><p>现在的智能手机一般都自带全景图拍摄功能. 就算没有, 通过安装一些第三方软件也可以拥有这个功能, 但通过这些软件拍出来的只是一个非常宽的照片, 还无法达到360随意转动观看的效果. 要制作像上面那样的360全景观看页面, 我们需要从最基础的开始. 首先, 什么是全景图?</p>
@@ -274,7 +267,7 @@
 <p>将新的纬圈设定scale为0, 再删除重叠的节点, 南北极就可以重新汇聚到一个点了. 接下来我们把全景图贴上, 一个全景球就这样诞生了.<br></p><p class="user_img"><img src="/img/post/Littly/2016-01-01/panoball.png" alt="全景球"></p><p></p>
 <p>我们将这个全景球通过io_three插件导出为json. 新建一个页面, 引入three.js. 核心代码大概是这样子:</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">objloader = <span class="keyword">new</span> THREE.ObjectLoader();</span><br><span class="line">objloader.load(</span><br><span class="line">	<span class="string">'js/360.json'</span>,</span><br><span class="line">	<span class="function"><span class="keyword">function</span> (<span class="params">obj</span>) </span>&#123;</span><br><span class="line">		scene = obj;</span><br><span class="line">		<span class="comment">//scene.add(new THREE.AmbientLight(0xffffff));</span></span><br><span class="line">		<span class="comment">//material = scene.children[0].material;</span></span><br><span class="line">		<span class="comment">//material.side = THREE.BackSide;</span></span><br><span class="line">		<span class="comment">//material.emissive = 0x000000;</span></span><br><span class="line">		animate();</span><br><span class="line">	&#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-<p>这里需要注意, 如果将没有注释部分的代码, 我们将会发现视野中一片黑. 这是因为Blender导出的模型默认使用的是遵守Phong光照模型的材质, 这种材质在没有配置自发光, 又没有外界光照的情况下就是一坨黑色. 所以我们还需要手动配置一下. blender导出的json是scene本身. scene是一个树状的结构, 在它的children属性中有所有的对象信息. 在这里, 我们需要配置一下贴图的方向以及自发光, 接下来就可以看到效果了.<br></p><p class="user_img"><img src="/img/post/Littly/2016-01-01/rendered1.png" alt="效果1"></p><p></p>
+<p>这里需要注意, 如果将注释部分的代码删去, 我们将会发现视野中一片黑. 这是因为Blender导出的模型默认使用的是遵守Phong光照模型的材质, 这种材质在没有配置自发光, 又没有外界光照的情况下就是一坨黑色. 所以我们还需要手动配置一下. blender导出的json是scene本身. scene是一个树状的结构, 在它的children属性中有所有的对象信息. 在这里, 我们需要配置一下贴图的方向以及自发光, 接下来就可以看到效果了.<br></p><p class="user_img"><img src="/img/post/Littly/2016-01-01/rendered1.png" alt="效果1"></p><p></p>
 <h2 id="动手做全景展示2">动手做全景展示2</h2><p>上面这样的实现其实也有一个弊端. 球状模型的顶点与面的数量十分逆天. 这些元素的数量越多, 耗费的浏览器资源就会越多. 那么有没有更加节能环保的方法呢?<br></p><p class="user_img"><img src="/img/post/Littly/2016-01-01/problem.png" alt="问题"></p><p></p>
 <p>答案是肯定的. 既然我们的人眼可以被类比为照相机, 那么如果摆多几台照相机, 将拍到的照片无重叠地拼在一起, 一样可以获得全景视觉.</p>
 <p>这里, 我们使用6台90度视角, 纵宽比1的照相机, 从球体中心分别朝向立方体六个面的方向.<br></p><p class="user_img"><img src="/img/post/Littly/2016-01-01/6camera.png" alt="6个照相机"></p><p></p>
